@@ -15,10 +15,10 @@
 
     <!-- Left column: product grid -->
     <div class="col-12 col-md-8 mb-4 mb-md-0">
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4"> <!-- can turn into flexbox to automatically move items down?-->
         <!-- Product card -->
         <div class="col">
-          <Item />
+          <Item /> <!-- change to <Item :item> used with v-for when props are made -->
           
         </div>
         <div class="col">
