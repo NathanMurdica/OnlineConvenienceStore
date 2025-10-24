@@ -1,79 +1,87 @@
+/* === Global Variables === */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --app-bg: #f8f9fa;            /* Light neutral background */
+  --app-text: #212529;          /* Bootstrap's standard text color */
+  --app-primary: #0d6efd;       /* Bootstrap blue */
+  --app-border: #dee2e6;        /* Subtle divider color */
+  --app-navbar-bg: #ffffff;     /* Navbar background */
+  --app-navbar-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --app-font: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
 }
 
-a {
+/* === Base Reset === */
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: var(--app-bg);
+  color: var(--app-text);
+  font-family: var(--app-font);
+  line-height: 1.5;
+}
+
+/* === Navbar Styling === */
+.navbar {
+  background-color: var(--app-navbar-bg) !important;
+  box-shadow: var(--app-navbar-shadow);
+  border-bottom: 1px solid var(--app-border);
+}
+
+.navbar .nav-link {
+  color: var(--app-text);
   font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+  transition: color 0.2s ease;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link.router-link-exact-active {
+  color: var(--app-primary);
+}
+
+/* === Layout Helpers === */
+.container {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* === Headings === */
+h1, h2, h3, h4 {
+  font-weight: 600;
+  color: var(--app-text);
+  margin-bottom: 1rem;
+}
+
+/* === Buttons === */
+.btn-primary {
+  background-color: var(--app-primary);
+  border-color: var(--app-primary);
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+  border-color: #0a58ca;
+}
+
+/* === Cards / Sections === */
+.card {
+  border: 1px solid var(--app-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background-color: #fff;
+}
+
+/* === Links === */
+a {
+  color: var(--app-primary);
+  text-decoration: none;
 }
 a:hover {
-  color: #535bf2;
+  text-decoration: underline;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-.card {
-  padding: 2em;
-}
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* === Utility === */
+.text-muted {
+  color: #6c757d !important;
 }
