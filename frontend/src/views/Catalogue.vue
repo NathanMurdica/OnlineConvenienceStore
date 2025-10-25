@@ -12,44 +12,87 @@
 
   <!-- Catalogue layout -->
   <div class="row">
-
-    <!-- Left column: product grid -->
-    <div class="col-12 col-md-8 mb-4 mb-md-0">
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4"> <!-- can turn into flexbox to automatically move items down?-->
-        <!-- Product card -->
-        <div class="col">
-          <Item /> <!-- change to <Item :item> used with v-for when props are made -->
-          
+      <!-- Left column: product flexbox -->
+      <div class="col-12 col-md-8 mb-4 mb-md-0">
+        <div class="d-flex flex-wrap justify-content-start gap-4 catalogue-grid">
+          <div
+            v-for="item in catalogueItems"
+            :key="item.id"
+            class="card p-3 shadow-sm flex-grow-1"
+            style="flex-basis: calc(33.333% - 1rem); max-width: 250px;"
+          >
+            <div class="card-body text-center">
+              <h5 class="card-title">{{ item.name }}</h5>
+              <p class="card-text text-muted">{{ item.formattedPrice }}</p>
+              <p v-if="item.isAvailable" class="text-success">
+                In stock: {{ item.stock }}
+              </p>
+              <p v-else class="text-danger">Out of stock</p>
+              <button
+                class="btn btn-primary btn-sm w-100"
+                :disabled="!item.isAvailable"
+                @click="addToCart(item)"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="col">
-          <Item />
-          
-        </div>
-        <div class="col">
-          <Item />
-          
-        </div>
-        <!-- Repeat for each product -->
       </div>
-    </div>
 
-    <!-- Right column: shopping cart summary -->
-    <div class="col-12 col-md-4">
-        <ShoppingCart /> <!-- update to <ShoppingCart :items /> when props are established -->
-    </div>
-
+      <!-- Right column: shopping cart summary -->
+      <div class="col-12 col-md-4">
+          <ShoppingCart /> <!-- update to <ShoppingCart :items /> when props are established -->
+      </div>
   </div>
 </div>
-
 </template>
 
 <script setup>
-import Item from '../components/Item.vue';
+import { ref, onMounted } from 'vue';
 import ShoppingCart from '../components/ShoppingCart.vue';
+import Item from '../models/item.js';
+import { fetchItems } from '../utils/database.js';
 
-// example method for adding items to cart
-// function addToCart(item) {
-//   // logic to add item to cart
-//     shoppingcartitems.push(item);
-// }
+// reactive lists
+const catalogueItems = ref([]);
+const cartItems = ref([]);
+
+// fetch catalogue items on component mount
+onMounted(async () => {
+  try {
+    const data = await fetchItems(); // backend fetch from database
+    catalogueItems.value = data.map(d => Item.fromJSON(d)); // wrap each into Item model
+  } catch (err) {
+    console.error('Failed to load catalogue:', err);
+  }
+});
+
+// add to cart logic
+function addToCart(item) {
+  const existing = cartItems.value.find(i => i.id === item.id);
+  if (existing) {
+    existing.quantity = (existing.quantity || 1) + 1;
+  } else {
+    cartItems.value.push({ ...item, quantity: 1 });
+  }
+}
 </script>
+
+<style scoped>
+.catalogue-grid {
+  align-content: flex-start;
+}
+
+@media (max-width: 768px) {
+  .catalogue-grid > .card {
+    flex-basis: calc(50% - 1rem);
+  }
+}
+
+@media (max-width: 576px) {
+  .catalogue-grid > .card {
+    flex-basis: 100%;
+  }
+}
+</style>
