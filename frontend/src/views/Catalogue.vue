@@ -12,38 +12,38 @@
 
   <!-- Catalogue layout -->
   <div class="row">
-      <!-- Left column: product flexbox -->
-      <div class="col-12 col-md-8 mb-4 mb-md-0">
-        <div class="d-flex flex-wrap justify-content-start gap-4 catalogue-grid">
-          <div
-            v-for="item in catalogueItems"
-            :key="item.id"
-            class="card p-3 shadow-sm flex-grow-1"
-            style="flex-basis: calc(33.333% - 1rem); max-width: 250px;"
-          >
-            <div class="card-body text-center">
-              <h5 class="card-title">{{ item.name }}</h5>
-              <p class="card-text text-muted">{{ item.formattedPrice }}</p>
-              <p v-if="item.isAvailable" class="text-success">
-                In stock: {{ item.stock }}
-              </p>
-              <p v-else class="text-danger">Out of stock</p>
-              <button
-                class="btn btn-primary btn-sm w-100"
-                :disabled="!item.isAvailable"
-                @click="addToCart(item)"
-              >
-                Add to Cart
-              </button>
-            </div>
+    <!-- Left column: product flexbox -->
+    <div class="col-12 col-md-8 mb-4 mb-md-0">
+      <div class="d-flex flex-wrap justify-content-start gap-4 catalogue-grid">
+        <div
+          v-for="item in catalogueItems"
+          :key="item.id"
+          class="card p-3 shadow-sm flex-grow-1"
+          style="flex-basis: calc(33.333% - 1rem); max-width: 250px;"
+        >
+          <div class="card-body text-center">
+            <h5 class="card-title">{{ item.name }}</h5>
+            <p class="card-text text-muted">{{ item.formattedPrice }}</p>
+            <p v-if="item.isAvailable" class="text-success">
+              In stock: {{ item.stock }}
+            </p>
+            <p v-else class="text-danger">Out of stock</p>
+            <button
+              class="btn btn-primary btn-sm w-100"
+              :disabled="!item.isAvailable"
+              @click="addToCart(item)"
+            >
+              Add to Cart
+            </button>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Right column: shopping cart summary -->
-      <div class="col-12 col-md-4">
-          <ShoppingCart /> <!-- update to <ShoppingCart :items /> when props are established -->
-      </div>
+    <!-- Right column: shopping cart summary -->
+    <div class="col-12 col-md-4">
+        <ShoppingCart /> <!-- update to <ShoppingCart :items /> when props are established -->
+    </div>
   </div>
 </div>
 </template>
