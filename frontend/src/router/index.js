@@ -7,6 +7,7 @@ import Checkout from "../views/Checkout.vue"
 const routes = [
     // NOTE: all pages aside from login will require "hasAuth = true" (set with localStorage) 
     // so user must login first
+    // either check if customer is set in localStorage OR check a boolean for login status
     { path: "/", name: "Catalogue", component: Catalogue }, 
     { path: "/login", name: "Login", component: Login }, 
     { path: "/register", name: "Register", component: Register },

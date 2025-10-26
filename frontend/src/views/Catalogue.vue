@@ -57,6 +57,12 @@ import { fetchItems } from '../utils/database.js';
 // reactive lists
 const catalogueItems = ref([]);
 const cartItems = ref([]);
+/*
+  Note: cartItems is currently unused.
+  Once ShoppingCart component accepts props, pass cartItems to it based on the shoppingCart class stored in the Customer model.
+  Then, watch cartItems for changes and update the ShoppingCart display accordingly (handled in ShoppingCart.vue with watch()).
+*/
+
 
 // fetch catalogue items on component mount
 onMounted(async () => {
