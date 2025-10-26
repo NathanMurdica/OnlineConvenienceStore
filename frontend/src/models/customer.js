@@ -23,8 +23,8 @@ class Customer {
     }
 
     checkout() {
-        const total = this.cart.getTotal();
-        const items = this.cart.getItems();
+        const total = this.cart.totalPrice;
+        const items = this.cart.items;
         
         this.cart.clear();
         return { total, items };
@@ -35,7 +35,10 @@ class Customer {
             id: this.id,
             name: this.name,
             email: this.email,
-            cart: this.cart.getItems()
+            cart: this.cart.items.map(({ item, quantity }) => ({
+                ...item.toJSON(),
+                quantity,
+            })),
         };
     }
 }

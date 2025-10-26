@@ -11,5 +11,16 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
+import Customer from '../models/customer.js';
 
+    onMounted(() => {
+        //create a customer class with a shopping cart and add to local storage.
+        const customer = new Customer({ id: 1, name: "John Doe", email: "john.doe@example.com" });
+        console.log('Customer set in localStorage:', customer);
+
+        localStorage.setItem('customer', JSON.stringify(customer));
+
+        
+    });
 </script>
