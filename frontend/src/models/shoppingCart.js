@@ -1,46 +1,65 @@
-class ShoppingCart {
-    constructor(items = []) {
-        // items: [{ productId, name, price, quantity }]
-        this.items = [...items];
+import Item from "./item.js";
+
+export default class ShoppingCart {
+    constructor() {
+        this.items = []; // { item: Item, quantity: number }
     }
-    
-    // add or update item in cart
-    addItem(item) {
-        const { productId, quantity = 1 } = item;
-        const existing = this.items.find(i => i.productId === productId);
+
+    addItem(item, quantity = 1) {
+        const existing = this.items.find(i => i.item.id === item.id);
         if (existing) {
-            existing.quantity += quantity;
+            if (existing.quantity < item.stock) {
+                existing.quantity += quantity;
+            }
         } else {
-            this.items.push({ ...item, quantity });
+            this.items.push({ item, quantity });
+        }
+
+        console.log(`Added ${quantity} of ${item.name} to cart.`);
+    }
+
+    removeItem(itemId) {
+        this.items = this.items.filter(i => i.item.id !== itemId);
+    }
+
+    increaseQuantity(itemId) {
+        const entry = this.items.find(i => i.item.id === itemId);
+        if (entry && entry.quantity < entry.item.stock) {
+            entry.quantity++;
         }
     }
 
-    removeItem(productId) {
-        this.items = this.items.filter(i => i.productId !== productId);
-    }
-
-    updateQuantity(productId, quantity) {
-        if (quantity <= 0) {
-            this.removeItem(productId);
-            return;
+    decreaseQuantity(itemId) {
+        const entry = this.items.find(i => i.item.id === itemId);
+        if (entry && entry.quantity > 1) {
+            entry.quantity--;
         }
-        const item = this.items.find(i => i.productId === productId);
-        if (item) item.quantity = quantity;
     }
 
-    clear() {
-        this.items = [];
+    get totalPrice() {
+        return this.items.reduce(
+            (sum, entry) => sum + entry.item.price * entry.quantity,
+            0
+        );
     }
 
-    getItems() {
-        return [...this.items];
+    get formattedTotal() {
+        return `$${this.totalPrice.toFixed(2)}`;
     }
 
-    getItemCount() {
-        return this.items.reduce((sum, i) => sum + i.quantity, 0);
+    toJSON() {
+        return this.items.map(({ item, quantity }) => ({
+            ...item.toJSON(),
+            quantity,
+        }));
     }
 
-    getTotal() {
-        return this.items.reduce((sum, i) => sum + (i.price || 0) * i.quantity, 0);
+    static fromJSON(cartData) {
+        const cart = new ShoppingCart();
+        cart.items = cartData.map(d => ({
+            item: Item.fromJSON(d),
+            quantity: d.quantity
+        }));
+        return cart;
     }
 }

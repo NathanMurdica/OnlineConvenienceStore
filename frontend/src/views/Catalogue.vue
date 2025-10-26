@@ -42,21 +42,29 @@
 
     <!-- Right column: shopping cart summary -->
     <div class="col-12 col-md-4">
-        <ShoppingCart /> <!-- update to <ShoppingCart :items /> when props are established -->
+        <ShoppingCart 
+          :cart="customer?.cart"
+          @increase="increaseQty"
+          @decrease="decreaseQty"
+          @remove="removeItem"
+          @checkout="checkout"
+        />
     </div>
   </div>
 </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import ShoppingCart from '../components/ShoppingCart.vue';
+import Customer from '../models/customer.js';
 import Item from '../models/item.js';
 import { fetchItems } from '../utils/database.js';
+import router from '../router/index.js';
 
 // reactive lists
 const catalogueItems = ref([]);
-const cartItems = ref([]);
+const customer = ref(null);
 /*
   Note: cartItems is currently unused.
   Once ShoppingCart component accepts props, pass cartItems to it based on the shoppingCart class stored in the Customer model.
@@ -66,6 +74,16 @@ const cartItems = ref([]);
 
 // fetch catalogue items on component mount
 onMounted(async () => {
+
+  // load customer and their cart from localStorage
+  const storedCustomer = localStorage.getItem('customer');
+  if (storedCustomer) {
+    customer.value = Customer.fromJSON(JSON.parse(storedCustomer));
+  } else {
+    console.warn('No customer found in localStorage.');
+  }
+
+  // load catalogue items from backend
   try {
     const data = await fetchItems(); // backend fetch from database
     catalogueItems.value = data.map(d => Item.fromJSON(d)); // wrap each into Item model
@@ -74,15 +92,41 @@ onMounted(async () => {
   }
 });
 
-// add to cart logic
-function addToCart(item) {
-  const existing = cartItems.value.find(i => i.id === item.id);
-  if (existing) {
-    existing.quantity = (existing.quantity || 1) + 1;
-  } else {
-    cartItems.value.push({ ...item, quantity: 1 });
-  }
+// watch for any change inside the customer's cart items
+watch(
+  () => customer.value?.cart.items,
+  // runs every time cart items change
+  () => {
+    if (customer.value) {
+      // persist updated cart + customer info to localStorage
+      localStorage.setItem('customer', JSON.stringify(customer.value));
+      console.log('Customer cart updated in localStorage:', customer.value.cart);
+    }
+  },
+  { deep: true }
+);
+
+function increaseQty(itemId) {
+  customer.value.cart.increaseQuantity(itemId);
+} 
+
+function decreaseQty(itemId) {
+  customer.value.cart.decreaseQuantity(itemId);
+} 
+
+function removeItem(itemId) {
+  customer.value.cart.removeItem(itemId);
 }
+
+function addToCart(item) {
+  customer.value.cart.addItem(item);
+}
+
+function checkout() {
+  // router push to checkout page
+  console.log('Proceeding to checkout with cart:', customer.value.cart);
+  router.push('/checkout');
+} 
 </script>
 
 <style scoped>

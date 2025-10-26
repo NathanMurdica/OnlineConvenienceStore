@@ -41,6 +41,16 @@ class Customer {
             })),
         };
     }
+
+    static fromJSON(json) {
+        const customer = new Customer({
+            id: json.id,
+            name: json.name,
+            email: json.email,
+        });
+        customer.cart = ShoppingCart.fromJSON(json.cart);
+        return customer;
+    }
 }
 
 export { ShoppingCart };
