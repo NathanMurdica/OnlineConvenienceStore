@@ -74,13 +74,11 @@
             <span>{{ formatCurrency(subtotal) }}</span>
           </div>
 
-
-        
           <div class="d-flex justify-content-between">
             <span>Tax (10%):</span>
             <span>{{ formatCurrency(tax) }}</span>
           </div>
-        
+
           <hr />
 
           <div class="d-flex justify-content-between fw-bold">
@@ -90,11 +88,15 @@
 
           <button
             class="btn btn-success w-100 mt-4"
-            :disabled="cartItems.length === 0"
+            :disabled="cartItems.length === 0 || loading"
             @click="confirmPurchase"
           >
-            Confirm Purchase
+            <span v-if="!loading">Confirm Purchase</span>
+            <span v-else>Processing...</span>
           </button>
+
+          <p v-if="errorMessage" class="text-danger mt-3">{{ errorMessage }}</p>
+          <p v-if="successMessage" class="text-success mt-3">{{ successMessage }}</p>
         </div>
       </div>
     </div>
@@ -106,15 +108,18 @@ import { ref, computed, onMounted, watch } from 'vue';
 import Customer from '../models/customer.js';
 import router from '../router/index.js';
 
-// reactive customer
+const API_BASE_URL = "http://127.0.0.1:8000"; // fastAPI backend URL
+
 const customer = ref(null);
+const loading = ref(false);
+const errorMessage = ref('');
+const successMessage = ref('');
 
 onMounted(() => {
   const storedCustomer = localStorage.getItem('customer');
   if (storedCustomer) {
     customer.value = Customer.fromJSON(JSON.parse(storedCustomer));
   } else {
-    console.warn('No customer found in localStorage.');
     router.push('/');
   }
 });
@@ -125,23 +130,18 @@ watch(
   () => {
     if (customer.value) {
       localStorage.setItem('customer', JSON.stringify(customer.value));
-      console.log('Customer cart updated in localStorage:', customer.value.cart);
     }
   },
   { deep: true }
 );
 
-// computed cart items
 const cartItems = computed(() => customer.value?.cart.items || []);
-
-// totals
 const subtotal = computed(() =>
   cartItems.value.reduce((sum, entry) => sum + entry.item.price * entry.quantity, 0)
 );
 const tax = computed(() => subtotal.value * 0.1);
 const total = computed(() => subtotal.value + tax.value);
 
-// cart actions
 function increaseQty(itemId) {
   customer.value.cart.increaseQuantity(itemId);
 }
@@ -155,21 +155,55 @@ function formatCurrency(amount) {
   return `$${amount.toFixed(2)}`;
 }
 
-function confirmPurchase() {
+async function confirmPurchase() {
   if (!customer.value) {
     alert('No customer found. Please log in or register before checking out.');
     return;
   }
 
-  console.log('Order confirmed:', customer.value, "Total: $", total.value);
+  loading.value = true;
+  errorMessage.value = '';
+  successMessage.value = '';
 
-  alert(`Thank you, ${customer.value.name}! Your purchase was successful.`);
+  try {
+    // build payload for backend
+    const payload = {
+      items: cartItems.value.map(entry => ({
+        id: entry.item.id,
+        quantity: entry.quantity
+      })),
+    };
 
-  // clear cart
-  customer.value.cart.items = [];
-  //localStorage.setItem('customer', JSON.stringify(customer.value));
+    const response = await fetch(`${API_BASE_URL}/checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
 
-  router.push('/');
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.detail || 'Checkout failed');
+    }
+
+    const data = await response.json();
+    console.log('Checkout successful:', data);
+
+    alert(`Thank you, ${customer.value.name}! Your purchase was successful.`);
+
+    // clear the customer's cart
+    customer.value.cart.items = [];
+    localStorage.setItem('customer', JSON.stringify(customer.value));
+
+    // redirect back to catalogue after short delay
+    setTimeout(() => {
+      router.push('/');
+    }, 1500);
+  } catch (err) {
+    console.error('Checkout error:', err);
+    errorMessage.value = err.message || 'An unexpected error occurred.';
+  } finally {
+    loading.value = false;
+  }
 }
 </script>
 
