@@ -112,8 +112,7 @@ const customer = ref(null);
 onMounted(() => {
   const storedCustomer = localStorage.getItem('customer');
   if (storedCustomer) {
-    const parsed = JSON.parse(storedCustomer);
-    customer.value = Customer.fromJSON(parsed);
+    customer.value = Customer.fromJSON(JSON.parse(storedCustomer));
   } else {
     console.warn('No customer found in localStorage.');
     router.push('/');
@@ -126,6 +125,7 @@ watch(
   () => {
     if (customer.value) {
       localStorage.setItem('customer', JSON.stringify(customer.value));
+      console.log('Customer cart updated in localStorage:', customer.value.cart);
     }
   },
   { deep: true }
@@ -161,21 +161,13 @@ function confirmPurchase() {
     return;
   }
 
-  console.log('Order confirmed:', {
-    customer: {
-      id: customer.value.id,
-      name: customer.value.name,
-      email: customer.value.email,
-    },
-    cart: customer.value.cart.items,
-    total: total.value,
-  });
+  console.log('Order confirmed:', customer.value, "Total: $", total.value);
 
   alert(`Thank you, ${customer.value.name}! Your purchase was successful.`);
 
   // clear cart
   customer.value.cart.items = [];
-  localStorage.setItem('customer', JSON.stringify(customer.value));
+  //localStorage.setItem('customer', JSON.stringify(customer.value));
 
   router.push('/');
 }
