@@ -26,10 +26,11 @@
 <script setup>
 import Customer from '../models/customer.js';
 import router from '../router/index.js';
+import { registerUser } from '../utils/database.js';
 
-const name = defineModel('');
-const email = defineModel('');
-const password = defineModel('');
+const name = defineModel('name');
+const email = defineModel('email');
+const password = defineModel('password');
 
 function register() {
   // Basic validation
@@ -38,12 +39,14 @@ function register() {
     return;
   }
 
-  // Create a simple customer instance and persist it to localStorage
+  // Create a simple customer instance
   const customer = new Customer({
-    id: Date.now(),
     name: name.value,
-    email: email.value
+    email: email.value,
+    password: password.value
   });
+
+  registerUser(customer);
 
   localStorage.setItem('customer', JSON.stringify(customer));
   // mark that the user is authenticated (simple flag used by router)

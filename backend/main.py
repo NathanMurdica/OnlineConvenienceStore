@@ -95,6 +95,15 @@ async def checkout(request: CheckoutRequest):
 async def register_user(new_user: User):
     """Add a new user to the system."""
     users = load_users()
+    # Check for existing email
+    for user in users:
+        if user["email"] == new_user.email:
+            raise HTTPException(status_code=400, detail="Email already exists")
+    
+    # Create unique ID
+    new_user.id = max([user["id"] for user in users], default=0) + 1
+    # Append and save new user
+    new_user.deleted = False
     users.append(new_user.model_dump())
     save_users(users)
 
