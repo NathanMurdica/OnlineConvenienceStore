@@ -45,5 +45,8 @@ function login() {
   console.log('Customer set in localStorage:', loginReturnValueOrWhatever);
 
   localStorage.setItem('customer', JSON.stringify(loginReturnValueOrWhatever));
+
+  // navigate to the catalogue (home)
+  router.push('/');
 }
 </script>

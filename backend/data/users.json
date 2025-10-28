@@ -10,5 +10,11 @@
         "name": "sdafdsa",
         "email": "fdsafds",
         "password": "afdsafdsafsdafdsafdsasdgcxzvcxz"
+    },
+    {
+        "id": 3,
+        "name": "Reuben",
+        "email": "who@where.com",
+        "password": "huh"
     }
 ]
