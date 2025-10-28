@@ -1,1 +1,14 @@
-[]
+[
+    {
+        "id": 1,
+        "name": "fdsa",
+        "email": "fdsafdsa",
+        "password": "fdsafdsafdsa"
+    },
+    {
+        "id": 2,
+        "name": "sdafdsa",
+        "email": "fdsafds",
+        "password": "afdsafdsafsdafdsafdsasdgcxzvcxz"
+    }
+]

@@ -9,10 +9,10 @@ from pathlib import Path
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
+    allow_origins=["http://localhost:5173"],  # Vite dev server default port
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 DATA_FILE = Path("data/catalogue.json")
@@ -31,7 +31,7 @@ def save_items(items):
 
 def load_users():
     if USER_FILE.exists():
-        with open(DATA_FILE, "r") as f:
+        with open(USER_FILE, "r") as f:
             return json.load(f)
     return []
 
@@ -51,7 +51,6 @@ class User(BaseModel):
     name: str
     email: str
     password: str
-    deleted: Optional[bool] = False
 
 class CheckoutItem(BaseModel):
     id: int
@@ -103,21 +102,17 @@ async def register_user(new_user: User):
     # Create unique ID
     new_user.id = max([user["id"] for user in users], default=0) + 1
     # Append and save new user
-    new_user.deleted = False
-    users.append(new_user.model_dump())
+    user_data = new_user.model_dump()
+    users.append(user_data)
     save_users(users)
+    
+    return {"message": "Registration successful", "user": user_data}
 
 @app.post("/login")
 async def authenticate_user(user_to_authenticate: User):
     """Check login information matches with the system."""
     users = load_users()
     for db_user in users:
-        if db_user.get("deleted", True):
-            continue # Skip deleted users
         if db_user["email"] == user_to_authenticate.email and db_user["password"] == user_to_authenticate.password:
             return {"message": "Login successful", "user": db_user} # Do the thing that does the authentication and returns a token or whatever
     raise HTTPException(status_code=401, detail="Invalid email or password")
-
-# @app.delete("/login")
-# async def delete_user():
-#     """Set deleted flag to true."""

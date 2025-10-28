@@ -41,9 +41,10 @@ function register() {
 
   // Create a simple customer instance
   const customer = new Customer({
+    id: 0,
     name: name.value,
     email: email.value,
-    password: password.value
+    password: password.value || ''
   });
 
   registerUser(customer);

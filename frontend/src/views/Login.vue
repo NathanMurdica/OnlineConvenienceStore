@@ -7,7 +7,7 @@
 
     <p>when login is successful, set the localStorage with a new Customer object. this is used for checking authorisation/login status as if the customer is not set i.e. is null in localStorage, you aren't logged in</p>
   </div>
-  <div class="card-body">
+  <div class="container card-body">
     <div class="mb-3">
       <label for="email" class="form-label">Email address</label>
       <input type="email" class="form-control" id="email" v-model="email" placeholder="Email" required>
@@ -28,9 +28,6 @@ import { loginUser } from '../utils/database.js';
 onMounted(() => {
   //create a customer class with a shopping cart and add to local storage.
   const customer = new Customer({ id: 1, name: "John Doe", email: "john.doe@example.com" });
-  console.log('Customer set in localStorage:', customer);
-
-  localStorage.setItem('customer', JSON.stringify(customer));
 });
 
 const email = defineModel('email');
@@ -38,11 +35,15 @@ const password = defineModel('password');
 
 function login() {
   const customer = new Customer({
+    id: 0,
     name: '',
     email: email.value,
     password: password.value
   });
 
-  loginUser(customer)
+  loginReturnValueOrWhatever = loginUser(customer)
+  console.log('Customer set in localStorage:', loginReturnValueOrWhatever);
+
+  localStorage.setItem('customer', JSON.stringify(loginReturnValueOrWhatever));
 }
 </script>

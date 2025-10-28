@@ -58,15 +58,15 @@ export async function registerUser(userData) {
         const response = await fetch(`${API_BASE_URL}/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user: userData }),
+            body: JSON.stringify(userData),
         });
 
+        const data = await response.json();
+        
         if (!response.ok) {
-            const err = await response.json();
-            throw new Error(err.detail || 'Registration failed');
+            throw new Error(data.detail || 'Registration failed');
         }
 
-        const data = await response.json();
         console.log('Registration success:', data.message);
         return data;
     } catch (error) {
@@ -81,7 +81,7 @@ export async function loginUser(credentials) {
         const response = await fetch(`${API_BASE_URL}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user: credentials }),
+            body: JSON.stringify(credentials),
         });
 
         if (!response.ok) {
