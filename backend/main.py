@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import json
 from pathlib import Path
 
@@ -16,6 +16,7 @@ app.add_middleware(
 )
 
 DATA_FILE = Path("data/catalogue.json")
+USER_FILE = Path("data/users.json")
 
 # ====== Helper functions ======
 def load_items():
@@ -28,12 +29,29 @@ def save_items(items):
     with open(DATA_FILE, "w") as f:
         json.dump(items, f, indent=4)
 
+def load_users():
+    if USER_FILE.exists():
+        with open(DATA_FILE, "r") as f:
+            return json.load(f)
+    return []
+
+def save_users(users):
+    with open(USER_FILE, "w") as f:
+        json.dump(users, f, indent=4)
+
 # ====== Models ======
 class Item(BaseModel):
     id: int
     name: str
     price: float
     stock: int
+
+class User(BaseModel):
+    id: int
+    name: str
+    email: str
+    password: str
+    deleted: Optional[bool] = False
 
 class CheckoutItem(BaseModel):
     id: int
@@ -72,3 +90,25 @@ async def checkout(request: CheckoutRequest):
     save_items(updated_items)
 
     return {"message": "Checkout successful", "updated_items": updated_items}
+
+@app.post("/register")
+async def register_user(new_user: User):
+    """Add a new user to the system."""
+    users = load_users()
+    users.append(new_user.model_dump())
+    save_users(users)
+
+@app.post("/login")
+async def authenticate_user(user_to_authenticate: User):
+    """Check login information matches with the system."""
+    users = load_users()
+    for db_user in users:
+        if db_user.get("deleted", True):
+            continue # Skip deleted users
+        if db_user["email"] == user_to_authenticate.email and db_user["password"] == user_to_authenticate.password:
+            return {"message": "Login successful", "user": db_user} # Do the thing that does the authentication and returns a token or whatever
+    raise HTTPException(status_code=401, detail="Invalid email or password")
+
+# @app.delete("/login")
+# async def delete_user():
+#     """Set deleted flag to true."""
