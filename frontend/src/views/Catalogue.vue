@@ -57,76 +57,64 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import ShoppingCart from '../components/ShoppingCart.vue';
+import Catalogue from '../models/catalogue.js';
 import Customer from '../models/customer.js';
-import Item from '../models/item.js';
-import { fetchItems } from '../utils/database.js';
 import router from '../router/index.js';
 
-// reactive lists
-const catalogueItems = ref([]);
+// reactive references
+const catalogue = ref(new Catalogue());
 const customer = ref(null);
-/*
-  Note: cartItems is currently unused.
-  Once ShoppingCart component accepts props, pass cartItems to it based on the shoppingCart class stored in the Customer model.
-  Then, watch cartItems for changes and update the ShoppingCart display accordingly (handled in ShoppingCart.vue with watch()).
-*/
+const catalogueItems = ref([]);
 
-
-// fetch catalogue items on component mount
+// fetch data on mount
 onMounted(async () => {
-
-  // load customer and their cart from localStorage
+  // load customer
   const storedCustomer = localStorage.getItem('customer');
   if (storedCustomer) {
     customer.value = Customer.fromJSON(JSON.parse(storedCustomer));
   } else {
     console.warn('No customer found in localStorage.');
+    customer.value = new Customer();
   }
 
-  // load catalogue items from backend
-  try {
-    const data = await fetchItems(); // backend fetch from database
-    catalogueItems.value = data.map(d => Item.fromJSON(d)); // wrap each into Item model
-  } catch (err) {
-    console.error('Failed to load catalogue:', err);
-  }
+  // load catalogue
+  await catalogue.value.loadItems();
+  catalogueItems.value = catalogue.value.items;
 });
 
-// watch for any change inside the customer's cart items
+// persist customer to localStorage on cart changes
 watch(
   () => customer.value?.cart.items,
-  // runs every time cart items change
   () => {
     if (customer.value) {
-      // persist updated cart + customer info to localStorage
       localStorage.setItem('customer', JSON.stringify(customer.value));
-      console.log('Customer cart updated in localStorage:', customer.value.cart);
     }
   },
   { deep: true }
 );
 
+// cart operations
+function addToCart(item) {
+  customer.value.cart.addItem(item);
+}
+
+// cart event handlers
 function increaseQty(itemId) {
   customer.value.cart.increaseQuantity(itemId);
-} 
+}
 
 function decreaseQty(itemId) {
   customer.value.cart.decreaseQuantity(itemId);
-} 
+}
 
 function removeItem(itemId) {
   customer.value.cart.removeItem(itemId);
 }
 
-function addToCart(item) {
-  customer.value.cart.addItem(item);
-}
-
 function checkout() {
-  // router push to checkout page
   console.log('Proceeding to checkout with cart:', customer.value.cart);
   router.push('/checkout');
-} 
+}
 </script>
 
 <style scoped>

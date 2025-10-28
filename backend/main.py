@@ -79,16 +79,16 @@ async def checkout(request: CheckoutRequest):
     # Validate and update stock
     for order_item in request.items:
         if order_item.id not in item_map:
-            raise HTTPException(status_code=404, detail=f"Item ID {order_item.id} not found")
+            return {"message": "Checkout failed", "error": f"Item ID {order_item.id} not found"}
         if item_map[order_item.id]["stock"] < order_item.quantity:
-            raise HTTPException(status_code=400, detail=f"Not enough stock for item ID {order_item.id}")
+            return {"message": "Checkout failed", "error": f"Not enough stock for item ID {order_item.id}"}
         item_map[order_item.id]["stock"] -= order_item.quantity
 
     # Save updated stock to file
     updated_items = list(item_map.values())
     save_items(updated_items)
 
-    return {"message": "Checkout successful", "updated_items": updated_items}
+    return {"message": "Checkout successful"}
 
 @app.post("/register")
 async def register_user(new_user: User):
