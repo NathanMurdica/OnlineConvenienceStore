@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import json
 from pathlib import Path
 
@@ -9,13 +9,14 @@ from pathlib import Path
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
+    allow_origins=["http://localhost:5173"],  # Vite dev server default port
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 DATA_FILE = Path("data/catalogue.json")
+USER_FILE = Path("data/users.json")
 
 # ====== Helper functions ======
 def load_items():
@@ -28,12 +29,28 @@ def save_items(items):
     with open(DATA_FILE, "w") as f:
         json.dump(items, f, indent=4)
 
+def load_users():
+    if USER_FILE.exists():
+        with open(USER_FILE, "r") as f:
+            return json.load(f)
+    return []
+
+def save_users(users):
+    with open(USER_FILE, "w") as f:
+        json.dump(users, f, indent=4)
+
 # ====== Models ======
 class Item(BaseModel):
     id: int
     name: str
     price: float
     stock: int
+
+class User(BaseModel):
+    id: int
+    name: str
+    email: str
+    password: str
 
 class CheckoutItem(BaseModel):
     id: int
@@ -72,3 +89,30 @@ async def checkout(request: CheckoutRequest):
     save_items(updated_items)
 
     return {"message": "Checkout successful"}
+
+@app.post("/register")
+async def register_user(new_user: User):
+    """Add a new user to the system."""
+    users = load_users()
+    # Check for existing email
+    for user in users:
+        if user["email"] == new_user.email:
+            raise HTTPException(status_code=400, detail="Email already exists")
+    
+    # Create unique ID
+    new_user.id = max([user["id"] for user in users], default=0) + 1
+    # Append and save new user
+    user_data = new_user.model_dump()
+    users.append(user_data)
+    save_users(users)
+    
+    return {"message": "Registration successful", "user": user_data}
+
+@app.post("/login")
+async def authenticate_user(user_to_authenticate: User):
+    """Check login information matches with the system."""
+    users = load_users()
+    for db_user in users:
+        if db_user["email"] == user_to_authenticate.email and db_user["password"] == user_to_authenticate.password:
+            return {"message": "Login successful", "user": db_user} # Do the thing that does the authentication and returns a token or whatever
+    raise HTTPException(status_code=401, detail="Invalid email or password")

@@ -3,10 +3,11 @@
 import ShoppingCart from '../models/shoppingCart.js'; 
 
 class Customer {
-    constructor({ id = null, name = '', email = '' } = {}) {
+    constructor({ id = null, name = '', email = '', password = '' } = {}) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.password = password;
         this.cart = new ShoppingCart();
     }
 
@@ -35,10 +36,7 @@ class Customer {
             id: this.id,
             name: this.name,
             email: this.email,
-            cart: this.cart.items.map(({ item, quantity }) => ({
-                ...item.toJSON(),
-                quantity,
-            })),
+            password: this.password
         };
     }
 
@@ -47,8 +45,8 @@ class Customer {
             id: json.id,
             name: json.name,
             email: json.email,
+            password: json.password,
         });
-        customer.cart = ShoppingCart.fromJSON(json.cart);
         return customer;
     }
 }

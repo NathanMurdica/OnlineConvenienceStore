@@ -51,3 +51,49 @@ export async function checkout(cartItems) {
         throw error;
     }
 }
+
+// ========== User Registration ==========
+export async function registerUser(userData) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData),
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.detail || 'Registration failed');
+        }
+
+        console.log('Registration success:', data.message);
+        return data;
+    } catch (error) {
+        console.error('Registration Error:', error);
+        throw error;
+    }
+}
+
+// ========== User Login ==========
+export async function loginUser(credentials) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(credentials),
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.detail || 'Login failed');
+        }
+
+        const data = await response.json();
+        console.log('Login success:', data.message);
+        return data.user || null;
+    } catch (error) {
+        console.error('Login Error:', error);
+        throw error;
+    }
+}
