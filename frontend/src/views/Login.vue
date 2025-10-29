@@ -1,12 +1,5 @@
 <template>
-  <div class="container mt-3">
-    <h1>Login</h1>
-    <p>login page with first name, last name, email/phone number?
-      <br>page is required to access catalogue, cart and checkout (this will be changed in the routes)
-    </p>
-
-    <p>when login is successful, set the localStorage with a new Customer object. this is used for checking authorisation/login status as if the customer is not set i.e. is null in localStorage, you aren't logged in</p>
-  </div>
+  <h1>Login</h1>
   <div class="container card-body">
     <div class="mb-3">
       <label for="email" class="form-label">Email address</label>
@@ -24,6 +17,7 @@
 import { onMounted } from 'vue';
 import Customer from '../models/customer.js';
 import { loginUser } from '../utils/database.js';
+import router from '../router/index.js';
 
 onMounted(() => {
   //create a customer class with a shopping cart and add to local storage.
@@ -41,10 +35,10 @@ function login() {
     password: password.value
   });
 
-  loginReturnValueOrWhatever = loginUser(customer)
-  console.log('Customer set in localStorage:', loginReturnValueOrWhatever);
+  const loginReturnValue = loginUser(customer)
+  console.log('Customer set in localStorage:', loginReturnValue);
 
-  localStorage.setItem('customer', JSON.stringify(loginReturnValueOrWhatever));
+  localStorage.setItem('customer', JSON.stringify(loginReturnValue));
 
   // navigate to the catalogue (home)
   router.push('/');
