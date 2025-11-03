@@ -1,22 +1,17 @@
 <template>
-  <div class="container mt-3">
-    <h1>Login</h1>
-    <p>login page with first name, last name, email/phone number?
-      <br>page is required to access catalogue, cart and checkout (this will be changed in the routes)
-    </p>
-
-    <p>when login is successful, set the localStorage with a new Customer object. this is used for checking authorisation/login status as if the customer is not set i.e. is null in localStorage, you aren't logged in</p>
-  </div>
+  <h1>Login</h1>
   <div class="container card-body">
-    <div class="mb-3">
-      <label for="email" class="form-label">Email address</label>
-      <input type="email" class="form-control" id="email" v-model="email" placeholder="Email" required>
-    </div>
-    <div class="mb-3">
-      <label for="password" class="form-label">Password</label>
-      <input type="password" class="form-control" id="password" v-model="password" placeholder="Password" required>
-    </div>
-    <button class="btn btn-primary" @click="login">Login</button>
+    <form v-on:submit.prevent="login">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email address</label>
+        <input type="email" class="form-control" id="email" v-model="email" placeholder="Email" required>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" id="password" v-model="password" placeholder="Password" required>
+      </div>
+      <button class="btn btn-primary" type="submit">Login</button>
+    </form>
   </div>
 </template>
 
@@ -24,6 +19,8 @@
 import { onMounted } from 'vue';
 import Customer from '../models/customer.js';
 import { loginUser } from '../utils/database.js';
+import router from '../router/index.js';
+import { DEVMODE } from '../main.js';
 
 onMounted(() => {
   //create a customer class with a shopping cart and add to local storage.
@@ -41,10 +38,17 @@ function login() {
     password: password.value
   });
 
-  loginReturnValueOrWhatever = loginUser(customer)
-  console.log('Customer set in localStorage:', loginReturnValueOrWhatever);
+  const userData = loginUser(customer)
+  if (!userData) {
+    alert('Login failed. Please check your email and password.');
+    return;
+  }
 
-  localStorage.setItem('customer', JSON.stringify(loginReturnValueOrWhatever));
+  if (DEVMODE) {
+    console.log('Customer set in localStorage:', userData);
+  }
+
+  localStorage.setItem('customer', JSON.stringify(userData));
 
   // navigate to the catalogue (home)
   router.push('/');

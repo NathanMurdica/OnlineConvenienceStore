@@ -45,7 +45,7 @@ class Customer {
             name: json.name,
             email: json.email,
             password: json.password,
-            cart: ShoppingCart.fromJSON(json.cart),
+            cart: json.cart ? ShoppingCart.fromJSON(json.cart) : ShoppingCart.fromJSON([]), // default to empty cart
         });
         return customer;
     }

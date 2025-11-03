@@ -91,6 +91,7 @@ export async function loginUser(credentials) {
 
         const data = await response.json();
         console.log('Login success:', data.message);
+        console.log('User data:', credentials);
         return data.user || null;
     } catch (error) {
         console.error('Login Error:', error);
