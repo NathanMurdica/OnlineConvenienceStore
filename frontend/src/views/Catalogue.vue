@@ -88,6 +88,7 @@ watch(
   () => {
     if (customer.value) {
       localStorage.setItem('customer', JSON.stringify(customer.value));
+      console.log('Customer cart updated:', localStorage.getItem('customer'));
     }
   },
   { deep: true }
@@ -113,6 +114,7 @@ function removeItem(itemId) {
 
 function checkout() {
   console.log('Proceeding to checkout with cart:', customer.value.cart);
+  localStorage.setItem('customer', JSON.stringify(customer.value));
   router.push('/checkout');
 }
 </script>
