@@ -1,14 +1,13 @@
-// frontend/src/models/customer.js
-
-import ShoppingCart from '../models/shoppingCart.js'; 
+import ShoppingCart from '../models/shoppingCart.js';
 
 class Customer {
-    constructor({ id = null, name = '', email = '', password = '' } = {}) {
+    constructor({ id = null, name = '', email = '', password = '', cart = null } = {}) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.cart = new ShoppingCart();
+        // accept an existing ShoppingCart if provided, otherwise make a new one
+        this.cart = cart instanceof ShoppingCart ? cart : new ShoppingCart();
     }
 
     addToCart(item) {
@@ -26,7 +25,6 @@ class Customer {
     checkout() {
         const total = this.cart.totalPrice;
         const items = this.cart.items;
-        
         this.cart.clear();
         return { total, items };
     }
@@ -36,7 +34,8 @@ class Customer {
             id: this.id,
             name: this.name,
             email: this.email,
-            password: this.password
+            password: this.password,
+            cart: this.cart.toJSON(),
         };
     }
 
@@ -46,6 +45,7 @@ class Customer {
             name: json.name,
             email: json.email,
             password: json.password,
+            cart: ShoppingCart.fromJSON(json.cart),
         });
         return customer;
     }

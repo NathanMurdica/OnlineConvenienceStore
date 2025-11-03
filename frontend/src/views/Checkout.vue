@@ -118,9 +118,13 @@ const successMessage = ref('');
 onMounted(() => {
   const storedCustomer = localStorage.getItem('customer');
   if (storedCustomer) {
-    customer.value = Customer.fromJSON(JSON.parse(storedCustomer));
-  } else {
-    router.push('/');
+    try {
+      const parsed = JSON.parse(storedCustomer);
+      customer.value = Customer.fromJSON(parsed);
+      console.log('Loaded customer:', customer.value);
+    } catch (err) {
+      console.error('Failed to parse customer from localStorage:', err);
+    }
   }
 });
 

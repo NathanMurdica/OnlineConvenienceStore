@@ -55,3 +55,4 @@ lerna-debug.log*
 
 # Users
 /backend/data/users.json
+backend/data/users.json
