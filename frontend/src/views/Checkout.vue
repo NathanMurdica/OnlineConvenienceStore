@@ -107,6 +107,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import Customer from '../models/customer.js';
 import router from '../router/index.js';
+import { DEVMODE } from '../main.js';
 
 const API_BASE_URL = "http://127.0.0.1:8000"; // fastAPI backend URL
 
@@ -117,11 +118,18 @@ const successMessage = ref('');
 
 onMounted(() => {
   const storedCustomer = localStorage.getItem('customer');
+
   if (storedCustomer) {
+    if (DEVMODE) {
+      console.log('Retrieving customer from localStorage:', storedCustomer);
+    }
     try {
       const parsed = JSON.parse(storedCustomer);
       customer.value = Customer.fromJSON(parsed);
-      console.log('Loaded customer:', customer.value);
+
+      if (DEVMODE) {
+        console.log('Loaded customer:', customer.value);
+      }
     } catch (err) {
       console.error('Failed to parse customer from localStorage:', err);
     }
@@ -178,6 +186,10 @@ async function confirmPurchase() {
       })),
     };
 
+    if (DEVMODE) {
+      console.log('Sending checkout payload to backend:', payload);
+    }
+
     const response = await fetch(`${API_BASE_URL}/checkout`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -189,8 +201,15 @@ async function confirmPurchase() {
       throw new Error(err.detail || 'Checkout failed');
     }
 
+    if (DEVMODE) {
+      console.log('Checkout response status:', response.status);
+    }
+
     const data = await response.json();
-    console.log('Checkout successful:', data);
+
+    if (DEVMODE) {
+      console.log('Checkout successful:', data);
+    }
 
     alert(`Thank you, ${customer.value.name}! Your purchase was successful.`);
 

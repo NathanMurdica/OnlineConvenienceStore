@@ -24,6 +24,7 @@
 import Customer from '../models/customer.js';
 import router from '../router/index.js';
 import { registerUser } from '../utils/database.js';
+import { DEVMODE } from '../main.js';
 
 const name = defineModel('name');
 const email = defineModel('email');
@@ -34,6 +35,10 @@ function register() {
   if (!name.value || !email.value || !password.value) {
     alert('Please fill in name, email and password.');
     return;
+  }
+
+  if (DEVMODE) {
+    console.log('Registering user:', { name: name.value, email: email.value, password: password.value });
   }
 
   // Create a simple customer instance
@@ -50,9 +55,17 @@ function register() {
     return;
   }
 
-  localStorage.setItem('customer', JSON.stringify(customer));
+  if (DEVMODE) {
+    console.log('Customer registered with Backend:', userData);
+  }
+
+  localStorage.setItem('customer', JSON.stringify(userData));
   // mark that the user is authenticated (simple flag used by router)
   localStorage.setItem('hasAuth', 'true');
+
+  if (DEVMODE) {
+    console.log('Customer set in localStorage:', localStorage.getItem('customer'));
+  }
 
   // navigate to the catalogue (home)
   router.push('/');

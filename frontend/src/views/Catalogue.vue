@@ -60,6 +60,7 @@ import ShoppingCart from '../components/ShoppingCart.vue';
 import Catalogue from '../models/catalogue.js';
 import Customer from '../models/customer.js';
 import router from '../router/index.js';
+import { DEVMODE } from '../main.js';
 
 // reactive references
 const catalogue = ref(new Catalogue());
@@ -69,9 +70,22 @@ const catalogueItems = ref([]);
 // fetch data on mount
 onMounted(async () => {
   // load customer
+  if (DEVMODE) {
+    console.log('Loading customer from localStorage:', localStorage.getItem('customer'));
+  }
+
   const storedCustomer = localStorage.getItem('customer');
   if (storedCustomer) {
+
+    if (DEVMODE) {
+      console.log('Stored customer data:', storedCustomer);
+    }
+
     customer.value = Customer.fromJSON(JSON.parse(storedCustomer));
+
+    if (DEVMODE) {
+      console.log('Loaded customer:', customer.value);
+    }
   } else {
     console.warn('No customer found in localStorage.');
     customer.value = new Customer();
@@ -79,6 +93,11 @@ onMounted(async () => {
 
   // load catalogue
   await catalogue.value.loadItems();
+
+  if (DEVMODE) {
+    console.log('Catalogue loaded:', catalogue.value);
+  }
+  
   catalogueItems.value = catalogue.value.items;
 });
 

@@ -23,11 +23,6 @@ import { loginUser } from '../utils/database.js';
 import router from '../router/index.js';
 import { DEVMODE } from '../main.js';
 
-onMounted(() => {
-  //create a customer class with a shopping cart and add to local storage.
-  const customer = new Customer({ id: 1, name: "John Doe", email: "john.doe@example.com" });
-});
-
 const email = defineModel('email');
 const password = defineModel('password');
 
@@ -46,10 +41,14 @@ function login() {
   }
 
   if (DEVMODE) {
-    console.log('Customer set in localStorage:', userData);
+    console.log('Customer got from Backend:', userData);
   }
 
   localStorage.setItem('customer', JSON.stringify(userData));
+
+  if (DEVMODE) {
+    console.log('Customer set in localStorage:', localStorage.getItem('customer'));
+  }
 
   // navigate to the catalogue (home)
   router.push('/');
