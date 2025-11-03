@@ -1,20 +1,23 @@
 <template>
 <div class="container mt-3">
   <h1>Register</h1>
+
   <div class="card-body">
-    <div class="mb-3">
-      <label for="name" class="form-label">Name</label>
-      <input type="text" class="form-control" id="firstName" v-model="name" placeholder="Name" required>
-    </div>
-    <div class="mb-3">
-      <label for="email" class="form-label">Email address</label>
-      <input type="email" class="form-control" id="email" v-model="email" placeholder="Email" required>
-    </div>
-    <div class="mb-3">
-      <label for="password" class="form-label">Password</label>
-      <input type="password" class="form-control" id="password" v-model="password" placeholder="Password" required>
-    </div>
-    <button class="btn btn-primary" @click="register">Register</button>
+    <form v-on:submit.prevent="register">
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="firstName" v-model="name" placeholder="Name" required>
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email address</label>
+        <input type="email" class="form-control" id="email" v-model="email" placeholder="Email" required>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" id="password" v-model="password" placeholder="Password" required>
+      </div>
+      <button class="btn btn-primary" type="submit">Register</button>
+    </form>
   </div>
 </div>
 </template>
@@ -43,7 +46,11 @@ function register() {
     password: password.value || ''
   });
 
-  registerUser(customer);
+  const userData = registerUser(customer)
+  if (!userData) {
+    alert('Registration failed. Please try again.');
+    return;
+  }
 
   localStorage.setItem('customer', JSON.stringify(customer));
   // mark that the user is authenticated (simple flag used by router)
