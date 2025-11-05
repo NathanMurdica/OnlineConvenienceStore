@@ -108,7 +108,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import Customer from '../models/customer.js';
 import router from '../router/index.js';
 
-const API_BASE_URL = "http://127.0.0.1:8000"; // fastAPI backend URL
+const API_BASE_URL = "http://127.0.0.1:8000"; // FastAPI backend
 
 const customer = ref(null);
 const loading = ref(false);
@@ -119,9 +119,7 @@ onMounted(() => {
   const storedCustomer = localStorage.getItem('customer');
   if (storedCustomer) {
     try {
-      const parsed = JSON.parse(storedCustomer);
-      customer.value = Customer.fromJSON(parsed);
-      console.log('Loaded customer:', customer.value);
+      customer.value = Customer.fromJSON(JSON.parse(storedCustomer));
     } catch (err) {
       console.error('Failed to parse customer from localStorage:', err);
     }
@@ -146,37 +144,27 @@ const subtotal = computed(() =>
 const tax = computed(() => subtotal.value * 0.1);
 const total = computed(() => subtotal.value + tax.value);
 
-function increaseQty(itemId) {
-  customer.value.cart.increaseQuantity(itemId);
-}
-function decreaseQty(itemId) {
-  customer.value.cart.decreaseQuantity(itemId);
-}
-function removeItem(itemId) {
-  customer.value.cart.removeItem(itemId);
-}
-function formatCurrency(amount) {
-  return `$${amount.toFixed(2)}`;
-}
+function increaseQty(itemId) { customer.value.cart.increaseQuantity(itemId); }
+function decreaseQty(itemId) { customer.value.cart.decreaseQuantity(itemId); }
+function removeItem(itemId) { customer.value.cart.removeItem(itemId); }
+function formatCurrency(amount) { return `$${amount.toFixed(2)}`; }
 
 async function confirmPurchase() {
-  if (!customer.value) {
-    alert('No customer found. Please log in or register before checking out.');
-    return;
-  }
+  if (!customer.value) return alert('No customer found. Please log in.');
 
   loading.value = true;
   errorMessage.value = '';
   successMessage.value = '';
 
   try {
-    // build payload for backend
+    // send checkout to backend API
     const payload = {
+      user_id: customer.value.id,
       items: cartItems.value.map(entry => ({
         id: entry.item.id,
         quantity: entry.quantity
-      })),
-    };
+  }))
+};
 
     const response = await fetch(`${API_BASE_URL}/checkout`, {
       method: 'POST',
@@ -189,38 +177,15 @@ async function confirmPurchase() {
       throw new Error(err.detail || 'Checkout failed');
     }
 
-    const data = await response.json();
-    console.log('Checkout successful:', data);
+    successMessage.value = 'Purchase successful!';
 
-    // Save order to localStorage as history
-    const newOrder = {
-      id: Date.now(),
-      date: new Date().toISOString(),
-      items: cartItems.value.map(entry => ({
-        item: {
-          id: entry.item.id,
-          name: entry.item.name,
-          price: entry.item.price
-        },
-        quantity: entry.quantity
-      })),
-      total: total.value
-    };
-
-    const existingOrders = JSON.parse(localStorage.getItem('pastOrders')) || [];
-    existingOrders.push(newOrder);
-    localStorage.setItem('pastOrders', JSON.stringify(existingOrders));
-
-    alert(`Thank you, ${customer.value.name}! Your purchase was successful.`);
-
-    // clear the customer's cart
+    // clear the cart
     customer.value.cart.items = [];
     localStorage.setItem('customer', JSON.stringify(customer.value));
 
-    // redirect back to catalogue after short delay
-    setTimeout(() => {
-      router.push('/');
-    }, 1500);
+    // redirect after short delay
+    setTimeout(() => router.push('/'), 1500);
+
   } catch (err) {
     console.error('Checkout error:', err);
     errorMessage.value = err.message || 'An unexpected error occurred.';

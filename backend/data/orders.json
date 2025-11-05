@@ -1,0 +1,42 @@
+[
+    {
+        "id": 1762328021,
+        "user_id": 3,
+        "date": "2025-11-05T18:33:41.594445",
+        "items": [
+            {
+                "id": 4,
+                "quantity": 3,
+                "name": "Bag of Chips",
+                "price": 2.5
+            },
+            {
+                "id": 7,
+                "quantity": 4,
+                "name": "Milk (1L)",
+                "price": 3.0
+            },
+            {
+                "id": 10,
+                "quantity": 1,
+                "name": "Fresh Fruit Pack",
+                "price": 6.0
+            }
+        ],
+        "total": 25.5
+    },
+    {
+        "id": 1762328103,
+        "user_id": 0,
+        "date": "2025-11-05T18:35:03.073429",
+        "items": [
+            {
+                "id": 4,
+                "quantity": 3,
+                "name": "Bag of Chips",
+                "price": 2.5
+            }
+        ],
+        "total": 7.5
+    }
+]

@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 import json
 from pathlib import Path
+from datetime import datetime
 
 # ====== Setup ======
 app = FastAPI()
@@ -17,6 +18,7 @@ app.add_middleware(
 
 DATA_FILE = Path("data/catalogue.json")
 USER_FILE = Path("data/users.json")
+ORDER_FILE = Path("data/orders.json")  
 
 # ====== Helper functions ======
 def load_items():
@@ -39,6 +41,16 @@ def save_users(users):
     with open(USER_FILE, "w") as f:
         json.dump(users, f, indent=4)
 
+def load_orders():
+    if ORDER_FILE.exists():
+        with open(ORDER_FILE, "r") as f:
+            return json.load(f)
+    return []
+
+def save_orders(orders):
+    with open(ORDER_FILE, "w") as f:
+        json.dump(orders, f, indent=4)
+
 # ====== Models ======
 class Item(BaseModel):
     id: int
@@ -57,6 +69,7 @@ class CheckoutItem(BaseModel):
     quantity: int
 
 class CheckoutRequest(BaseModel):
+    user_id: int
     items: List[CheckoutItem]
 
 # ====== API Routes ======
@@ -88,7 +101,28 @@ async def checkout(request: CheckoutRequest):
     updated_items = list(item_map.values())
     save_items(updated_items)
 
+    # Save order to orders.json
+    orders = load_orders()
+    order_total = sum(item_map[oi.id]["price"] * oi.quantity for oi in request.items)
+    new_order = {
+        "id": int(datetime.now().timestamp()),  # unique order ID
+        "user_id": request.user_id,             # requires adding user_id to CheckoutRequest
+        "date": datetime.now().isoformat(),
+        "items": [
+            {
+                "id": oi.id,
+                "quantity": oi.quantity,
+                "name": item_map[oi.id]["name"],
+                "price": item_map[oi.id]["price"]
+            } for oi in request.items
+        ],
+        "total": order_total
+    }
+    orders.append(new_order)
+    save_orders(orders)
+
     return {"message": "Checkout successful"}
+    
 
 @app.post("/register")
 async def register_user(new_user: User):
@@ -116,3 +150,10 @@ async def authenticate_user(user_to_authenticate: User):
         if db_user["email"] == user_to_authenticate.email and db_user["password"] == user_to_authenticate.password:
             return {"message": "Login successful", "user": db_user} # Do the thing that does the authentication and returns a token or whatever
     raise HTTPException(status_code=401, detail="Invalid email or password")
+
+@app.get("/orders/{user_id}")
+async def get_orders(user_id: int):
+    """Return all past orders for a specific user."""
+    orders = load_orders()
+    user_orders = [o for o in orders if o["user_id"] == user_id]
+    return {"orders": user_orders}

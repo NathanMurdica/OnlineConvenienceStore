@@ -1,19 +1,14 @@
 <template>
   <div class="container mt-4 mb-5">
-    <div class="row mb-4">
-      <div class="col">
-        <h2 class="fw-bold text-center text-md-start">Order History</h2>
-        <hr class="mt-2 mb-4">
-      </div>
-    </div>
+    <h2 class="fw-bold text-center mb-4">Order History</h2>
 
     <div v-if="orders.length > 0">
-      <div v-for="(order, index) in orders" :key="order.id" class="card p-3 shadow-sm mb-3">
-        <h5>Order placed on: {{ formatDate(order.date) }}</h5>
+      <div v-for="(order, idx) in orders" :key="idx" class="card p-3 shadow-sm mb-3">
+        <h5>Order placed: {{ formatDate(order.date) }}</h5>
         <ul class="list-group mb-2">
-          <li v-for="entry in order.items" :key="entry.item.id" class="list-group-item d-flex justify-content-between">
-            <span>{{ entry.item.name }} (x{{ entry.quantity }})</span>
-            <span>{{ formatCurrency(entry.item.price * entry.quantity) }}</span>
+          <li v-for="item in order.items" :key="item.id" class="list-group-item d-flex justify-content-between">
+            <span>{{ item.name }} (x{{ item.quantity }})</span>
+            <span>{{ formatCurrency(item.price * item.quantity) }}</span>
           </li>
         </ul>
         <div class="d-flex justify-content-between fw-bold">
@@ -32,25 +27,29 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import Customer from '../models/customer.js';
 
+const API_BASE_URL = "http://127.0.0.1:8000";
+const customer = ref(null);
 const orders = ref([]);
 
-onMounted(() => {
-  orders.value = JSON.parse(localStorage.getItem('pastOrders')) || [];
+onMounted(async () => {
+  const storedCustomer = localStorage.getItem('customer');
+  if (storedCustomer) {
+    customer.value = Customer.fromJSON(JSON.parse(storedCustomer));
+    // fetch orders from backend for this customer
+    try {
+      const res = await fetch(`${API_BASE_URL}/orders/${customer.value.id}`);
+      const data = await res.json();
+      orders.value = data.orders || [];
+    } catch (err) {
+      console.error('Failed to fetch orders:', err);
+    }
+  }
 });
 
-function formatCurrency(amount) {
-  return `$${amount.toFixed(2)}`;
-}
-
+function formatCurrency(amount) { return `$${amount.toFixed(2)}`; }
 function formatDate(dateStr) {
-  const d = new Date(dateStr);
-  return d.toLocaleString();
+  return new Date(dateStr).toLocaleString();
 }
 </script>
-
-<style scoped>
-.card {
-  border-radius: 10px;
-}
-</style>
