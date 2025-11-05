@@ -192,6 +192,25 @@ async function confirmPurchase() {
     const data = await response.json();
     console.log('Checkout successful:', data);
 
+    // Save order to localStorage as history
+    const newOrder = {
+      id: Date.now(),
+      date: new Date().toISOString(),
+      items: cartItems.value.map(entry => ({
+        item: {
+          id: entry.item.id,
+          name: entry.item.name,
+          price: entry.item.price
+        },
+        quantity: entry.quantity
+      })),
+      total: total.value
+    };
+
+    const existingOrders = JSON.parse(localStorage.getItem('pastOrders')) || [];
+    existingOrders.push(newOrder);
+    localStorage.setItem('pastOrders', JSON.stringify(existingOrders));
+
     alert(`Thank you, ${customer.value.name}! Your purchase was successful.`);
 
     // clear the customer's cart
@@ -210,6 +229,7 @@ async function confirmPurchase() {
   }
 }
 </script>
+
 
 <style scoped>
 .card {
