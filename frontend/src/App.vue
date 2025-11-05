@@ -16,7 +16,7 @@
           <router-link class="nav-link" to="/register">Register</router-link>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link" to="/OrderHistory">OrderHistory</router-link>
+          <router-link class="nav-link" to="/OrderHistory">Order History</router-link>
         </li>
       </ul>
     </nav>
