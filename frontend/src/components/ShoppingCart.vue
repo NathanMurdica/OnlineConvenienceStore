@@ -73,7 +73,7 @@ const props = defineProps({
 const emit = defineEmits(["increase", "decrease", "remove", "checkout"]);
 
 watch(() => props.cart, (newCart) => {
-  console.log('ShoppingCart props changed:', newCart);
+  debug('ShoppingCart props changed:', newCart);
 }, { deep: true });
 
 </script>

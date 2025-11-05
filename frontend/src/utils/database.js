@@ -44,7 +44,9 @@ export async function checkout(cartItems) {
         }
 
         const data = await response.json();
-        console.log('Checkout success:', data.message);
+
+        debug('Checkout success:', data.message);
+
         return data.updated_items || [];
     } catch (error) {
         console.error('Checkout Error:', error);
@@ -67,7 +69,8 @@ export async function registerUser(userData) {
             throw new Error(data.detail || 'Registration failed');
         }
 
-        console.log('Registration success:', data.message);
+        debug('Registration success:', data.message);
+
         return data;
     } catch (error) {
         console.error('Registration Error:', error);
@@ -90,8 +93,10 @@ export async function loginUser(credentials) {
         }
 
         const data = await response.json();
-        console.log('Login success:', data.message);
-        console.log('User data:', credentials);
+
+        debug('Login success:', data.message);
+        debug('User data:', data.user);
+
         return data.user || null;
     } catch (error) {
         console.error('Login Error:', error);

@@ -15,7 +15,7 @@ export default class ShoppingCart {
             this.items.push({ item, quantity });
         }
 
-        console.log(`Added ${quantity} of ${item.name} to cart.`);
+        debug(`Added ${quantity} of ${item.name} to cart.`);
     }
 
     removeItem(itemId) {

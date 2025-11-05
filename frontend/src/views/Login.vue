@@ -21,7 +21,7 @@ import { onMounted } from 'vue';
 import Customer from '../models/customer.js';
 import { loginUser } from '../utils/database.js';
 import router from '../router/index.js';
-import { DEVMODE } from '../main.js';
+import { debug } from "../utils/debug.js"
 
 const email = defineModel('email');
 const password = defineModel('password');
@@ -34,21 +34,20 @@ function login() {
     password: password.value
   });
 
-  const userData = loginUser(customer)
+  const userData = loginUser(customer);
+
+  debug('User Data from loginUser:', userData);
+
   if (!userData) {
     alert('Login failed. Please check your email and password.');
     return;
   }
 
-  if (DEVMODE) {
-    console.log('Customer got from Backend:', userData);
-  }
+  debug('Customer got from Backend:', userData);
 
   localStorage.setItem('customer', JSON.stringify(userData));
 
-  if (DEVMODE) {
-    console.log('Customer set in localStorage:', localStorage.getItem('customer'));
-  }
+  debug('Customer set in localStorage:', localStorage.getItem('customer'));
 
   // navigate to the catalogue (home)
   router.push('/');
