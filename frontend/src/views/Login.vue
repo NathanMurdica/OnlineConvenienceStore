@@ -22,32 +22,31 @@ import { loginUser } from '../utils/database.js';
 import router from '../router/index.js';
 import { debug } from "../utils/debug.js"
 import { ref } from 'vue';
+import { ShoppingCart } from '../models/shoppingCart.ts';
 
 const email = defineModel('email');
 const password = defineModel('password');
+// Remove Temporary Defaults!!!
+email.value = "fdsa@fdsa";
+password.value = "fdsa";
 
 const customer = ref(new Customer());
-const userData = ref(null);
+// const userData = ref(null);
 
 async function login() {
   try {
-    customer.value = new Customer({
-      id: 0,
-      name: '',
-      email: email.value,
-      password: password.value
-    });
+    customer.value = new Customer({ id: 0, name: '', email: email.value, password: password.value, cart: new ShoppingCart() });
+    debug('(Login) Logging in user:', customer.value);
+    const userData = await loginUser(customer.value);
 
-    userData.value = await loginUser(customer.value);
-
-    if (!userData.value) {
+    if (!userData) {
       alert('Login failed. Please check your email and password.');
       return;
     } 
     else {
-      debug('(Login) User Data from Backend:', userData.value);
+      debug('(Login) User Data from Backend:', userData);
 
-      const storedCustomer = Customer.fromJSON(userData.value);
+      const storedCustomer = new Customer(userData);
 
       debug('(Login) Customer to set in localStorage:', storedCustomer);
 

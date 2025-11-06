@@ -16,7 +16,7 @@ class Customer {
         this.email = email;
         this.password = password;
         // accept an existing ShoppingCart if provided, otherwise make a new one
-        this.cart = cart ? ShoppingCart.fromJSON(cart) : ShoppingCart.fromJSON([]);
+        this.cart = cart ? ShoppingCart.fromJSON(cart) : new ShoppingCart();
     }
 
     addToCart(item: Item) {
@@ -35,7 +35,7 @@ class Customer {
         const total = this.cart.totalPrice;
         const items = this.cart.items;
         // this.cart.clear();
-        this.cart = ShoppingCart.fromJSON([]); // reset to empty cart
+        this.cart = new ShoppingCart(); // reset to empty cart
         return { total, items };
     }
 
@@ -51,15 +51,18 @@ class Customer {
 
     static fromJSON(json: any): Customer {
         debug('(Customer.fromJSON) Deserializing Customer from JSON:', json);
-        // Ensure cart data is an array
+        
         const cartData = Array.isArray(json.cart) ? json.cart : [];
+        debug('(Customer.fromJSON) Cart data:', cartData);
+        
         const customer = new Customer({
             id: json.id,
             name: json.name,
             email: json.email,
             password: json.password,
-            cart: ShoppingCart.fromJSON(cartData), // Always pass an array
+            cart: cartData // ShoppingCart constructor will handle this
         });
+        
         debug('(Customer.fromJSON) Deserialized Customer from JSON:', customer);
         return customer;
     }
@@ -72,7 +75,9 @@ class Customer {
     static fromLocalStorage(): Customer {
         const data = localStorage.getItem('customer');
         if (data) {
+            debug('(Customer.fromLocalStorage) Customer data from localStorage:', data);
             try {
+                debug('(Customer.fromLocalStorage) JSON.parse on customer data:', JSON.parse(data));
                 const customer = Customer.fromJSON(JSON.parse(data));
                 debug('(Customer.fromLocalStorage) Loaded Customer from localStorage:', customer);
                 return customer;
@@ -86,5 +91,4 @@ class Customer {
     }
 }
 
-export { ShoppingCart };
 export default Customer;

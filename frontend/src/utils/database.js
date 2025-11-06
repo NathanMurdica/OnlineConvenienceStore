@@ -4,6 +4,7 @@
 */
 
 import Item from '../models/item.ts';
+import Customer from '../models/customer.ts';
 import { debug } from './debug.js';
 
 const API_BASE_URL = 'http://localhost:8000'; // FastAPI default port
@@ -80,7 +81,7 @@ export async function registerUser(userData) {
 }
 
 // ========== User Login ==========
-export async function loginUser(credentials) {
+export async function loginUser(credentials/*: Customer */) {
     try {
         const response = await fetch(`${API_BASE_URL}/login`, {
             method: 'POST',
@@ -94,13 +95,14 @@ export async function loginUser(credentials) {
         }
 
         const data = await response.json();
+        debug('(database.loginUser) Login success:', data.message);
+        debug('(database.loginUser) User data from database:', data.user);
+        const customer = new Customer(data.user);
+        debug('(database.loginUser) Created Customer instance:', customer);
 
-        debug('Login success:', data.message);
-        debug('User data from database:', data.user);
-
-        return data.user || null;
+        return customer || null;
     } catch (error) {
-        console.error('Login Error:', error);
+        console.error('(database.loginUser) Login Error:', error);
         throw error;
     }
 }

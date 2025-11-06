@@ -1,7 +1,7 @@
 import Item from "./item.ts";
 import { debug } from "../utils/debug.js";
 
-export default class ShoppingCart {
+class ShoppingCart {
     items: { item: Item; quantity: number }[];
 
     constructor() {
@@ -59,16 +59,28 @@ export default class ShoppingCart {
 
     static fromJSON(cartData: any): ShoppingCart {
         const cart = new ShoppingCart();
+        
         // Handle null, undefined, or non-array input
         if (!cartData || !Array.isArray(cartData)) {
-            debug('Creating empty shopping cart - no valid cart data provided');
+            debug('(ShoppingCart.fromJSON) No valid cart data provided, creating empty cart.');
             return cart;
         }
-    
-        cart.items = cartData.map(d => ({
-            item: Item.fromJSON(d),
-            quantity: d.quantity || 1
-        }));
+        
+        debug('(ShoppingCart.fromJSON) Deserializing ShoppingCart from JSON:', cartData);
+        
+        cartData.forEach(item => {
+            if (item && typeof item === 'object') {
+                const itemData = item.item || item; // handle both {item, quantity} and direct item format
+                cart.items.push({
+                    item: Item.fromJSON(itemData),
+                    quantity: item.quantity || 1
+                });
+            }
+        });
+        
         return cart;
     }
 }
+
+export { ShoppingCart };
+export default ShoppingCart;
