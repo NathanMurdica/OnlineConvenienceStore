@@ -120,14 +120,6 @@ const successMessage = ref('');
 
 onMounted(() => {
   customer.value = Customer.fromLocalStorage();
-  // const storedCustomer = localStorage.getItem('customer');
-  // if (storedCustomer) {
-  //   try {
-  //     customer.value = Customer.fromJSON(JSON.parse(storedCustomer));
-  //   } catch (err) {
-  //     console.error('Failed to parse customer from localStorage:', err);
-  //   }
-  // }
 });
 
 // persist updates
@@ -136,7 +128,6 @@ watch(
   () => {
     if (customer.value) {
       Customer.toLocalStorage(customer.value);
-      // localStorage.setItem('customer', JSON.stringify(customer.value));
     }
   },
   { deep: true }
