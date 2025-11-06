@@ -43,7 +43,7 @@
     <!-- Right column: shopping cart summary -->
     <div class="col-12 col-md-4">
         <ShoppingCart 
-          :cart="customer?.cart"
+          :cart="customer.value?.cart"
           @increase="increaseQty"
           @decrease="decreaseQty"
           @remove="removeItem"
@@ -58,33 +58,21 @@
 import { ref, onMounted, watch } from 'vue';
 import ShoppingCart from '../components/ShoppingCart.vue';
 import Catalogue from '../models/catalogue.js';
-import Customer from '../models/customer.js';
+import Customer from '../models/customer.ts';
 import router from '../router/index.js';
 import { debug } from "../utils/debug.js"
 
 // reactive references
 const catalogue = ref(new Catalogue());
-const customer = ref(null);
+const customer = ref(new Customer());
 const catalogueItems = ref([]);
 
 // fetch data on mount
 onMounted(async () => {
   // load customer
-  debug('Loading customer from localStorage:', localStorage.getItem('customer'));
+  debug('Loading customer from localStorage:', Customer.fromLocalStorage());
 
-  const storedCustomer = localStorage.getItem('customer');
-  if (storedCustomer) {
-
-    debug('Stored customer data:', storedCustomer);
-
-    customer.value = Customer.fromJSON(JSON.parse(storedCustomer));
-
-    debug('Loaded customer:', customer.value);
-
-  } else {
-    console.warn('No customer found in localStorage.');
-    customer.value = new Customer();
-  }
+  customer.value = Customer.fromLocalStorage();
 
   // load catalogue
   await catalogue.value.loadItems();
@@ -99,7 +87,8 @@ watch(
   () => customer.value?.cart.items,
   () => {
     if (customer.value) {
-      localStorage.setItem('customer', JSON.stringify(customer.value));
+      Customer.toLocalStorage(customer.value);
+      // localStorage.setItem('customer', customer.value.toJSON());
       debug('Customer cart updated:', localStorage.getItem('customer'));
     }
   },
@@ -126,7 +115,8 @@ function removeItem(itemId) {
 
 function checkout() {
   debug('Proceeding to checkout with cart:', customer.value.cart);
-  localStorage.setItem('customer', JSON.stringify(customer.value));
+  Customer.toLocalStorage(customer.value);
+  // localStorage.setItem('customer', JSON.stringify(customer.value));
   router.push('/checkout');
 }
 </script>

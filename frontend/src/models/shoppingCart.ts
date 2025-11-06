@@ -1,11 +1,14 @@
-import Item from "./item.js";
+import Item from "./item.ts";
+import { debug } from "../utils/debug.js";
 
 export default class ShoppingCart {
+    items: { item: Item; quantity: number }[];
+
     constructor() {
         this.items = []; // { item: Item, quantity: number }
     }
 
-    addItem(item, quantity = 1) {
+    addItem(item: Item, quantity: number = 1) {
         const existing = this.items.find(i => i.item.id === item.id);
         if (existing) {
             if (existing.quantity < item.stock) {
@@ -18,47 +21,53 @@ export default class ShoppingCart {
         debug(`Added ${quantity} of ${item.name} to cart.`);
     }
 
-    removeItem(itemId) {
+    removeItem(itemId: number) {
         this.items = this.items.filter(i => i.item.id !== itemId);
     }
 
-    increaseQuantity(itemId) {
+    increaseQuantity(itemId: number) {
         const entry = this.items.find(i => i.item.id === itemId);
         if (entry && entry.quantity < entry.item.stock) {
             entry.quantity++;
         }
     }
 
-    decreaseQuantity(itemId) {
+    decreaseQuantity(itemId: number) {
         const entry = this.items.find(i => i.item.id === itemId);
         if (entry && entry.quantity > 1) {
             entry.quantity--;
         }
     }
 
-    get totalPrice() {
+    get totalPrice(): number {
         return this.items.reduce(
             (sum, entry) => sum + entry.item.price * entry.quantity,
             0
         );
     }
 
-    get formattedTotal() {
+    get formattedTotal(): string {
         return `$${this.totalPrice.toFixed(2)}`;
     }
 
-    toJSON() {
+    toJSON(): any[] {
         return this.items.map(({ item, quantity }) => ({
             ...item.toJSON(),
             quantity,
         }));
     }
 
-    static fromJSON(cartData) {
+    static fromJSON(cartData: any): ShoppingCart {
         const cart = new ShoppingCart();
+        // Handle null, undefined, or non-array input
+        if (!cartData || !Array.isArray(cartData)) {
+            debug('Creating empty shopping cart - no valid cart data provided');
+            return cart;
+        }
+    
         cart.items = cartData.map(d => ({
             item: Item.fromJSON(d),
-            quantity: d.quantity
+            quantity: d.quantity || 1
         }));
         return cart;
     }

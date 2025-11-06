@@ -3,7 +3,8 @@
     Handles API calls to the backend to fetch and manipulate data.
 */
 
-import Item from '../models/item.js';
+import Item from '../models/item.ts';
+import { debug } from './debug.js';
 
 const API_BASE_URL = 'http://localhost:8000'; // FastAPI default port
 
@@ -62,12 +63,12 @@ export async function registerUser(userData) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userData),
         });
-
-        const data = await response.json();
         
         if (!response.ok) {
             throw new Error(data.detail || 'Registration failed');
         }
+
+        const data = await response.json();
 
         debug('Registration success:', data.message);
 
@@ -95,7 +96,7 @@ export async function loginUser(credentials) {
         const data = await response.json();
 
         debug('Login success:', data.message);
-        debug('User data:', data.user);
+        debug('User data from database:', data.user);
 
         return data.user || null;
     } catch (error) {

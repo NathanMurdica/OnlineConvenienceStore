@@ -17,39 +17,55 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
-import Customer from '../models/customer.js';
+import Customer from '../models/customer.ts';
 import { loginUser } from '../utils/database.js';
 import router from '../router/index.js';
 import { debug } from "../utils/debug.js"
+import { ref } from 'vue';
 
 const email = defineModel('email');
 const password = defineModel('password');
 
-function login() {
-  const customer = new Customer({
-    id: 0,
-    name: '',
-    email: email.value,
-    password: password.value
-  });
+const customer = ref(new Customer());
+const userData = ref(null);
 
-  const userData = loginUser(customer);
+async function login() {
+  try {
+    customer.value = new Customer({
+      id: 0,
+      name: '',
+      email: email.value,
+      password: password.value
+    });
 
-  debug('User Data from loginUser:', userData);
+    userData.value = await loginUser(customer.value);
 
-  if (!userData) {
+    if (!userData.value) {
+      alert('Login failed. Please check your email and password.');
+      return;
+    } 
+    else {
+      debug('(Login) User Data from Backend:', userData.value);
+
+      const storedCustomer = Customer.fromJSON(userData.value);
+
+      debug('(Login) Customer to set in localStorage:', storedCustomer);
+
+      Customer.toLocalStorage(storedCustomer);
+      localStorage.setItem('hasAuth', 'true');
+      const customerFromStorage = Customer.fromLocalStorage();
+
+      debug('(Login) Created Authentication token');
+      debug('(Login) Value in LocalStorage:', localStorage.getItem('customer'));
+      debug('(Login) Customer set in localStorage:', customerFromStorage);
+
+      // navigate to the catalogue (home)
+      router.push('/');
+    } 
+  } 
+  catch (error) {
+    console.error('Login error:', error);
     alert('Login failed. Please check your email and password.');
-    return;
   }
-
-  debug('Customer got from Backend:', userData);
-
-  localStorage.setItem('customer', JSON.stringify(userData));
-
-  debug('Customer set in localStorage:', localStorage.getItem('customer'));
-
-  // navigate to the catalogue (home)
-  router.push('/');
 }
 </script>

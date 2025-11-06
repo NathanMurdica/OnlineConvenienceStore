@@ -105,7 +105,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import Customer from '../models/customer.js';
+import Customer from '../models/customer.ts';
 import router from '../router/index.js';
 import { debug } from "../utils/debug.js"
 
@@ -117,19 +117,7 @@ const errorMessage = ref('');
 const successMessage = ref('');
 
 onMounted(() => {
-  const storedCustomer = localStorage.getItem('customer');
-
-  if (storedCustomer) {
-    debug('Retrieving customer from localStorage:', storedCustomer);
-    try {
-      const parsed = JSON.parse(storedCustomer);
-      customer.value = Customer.fromJSON(parsed);
-
-      debug('Loaded customer:', customer.value);
-    } catch (err) {
-      console.error('Failed to parse customer from localStorage:', err);
-    }
-  }
+  customer.value = Customer.fromLocalStorage();
 });
 
 // persist updates
@@ -137,7 +125,8 @@ watch(
   () => customer.value?.cart.items,
   () => {
     if (customer.value) {
-      localStorage.setItem('customer', JSON.stringify(customer.value));
+      Customer.toLocalStorage(customer.value);
+      // localStorage.setItem('customer', JSON.stringify(customer.value));
     }
   },
   { deep: true }
@@ -205,7 +194,7 @@ async function confirmPurchase() {
 
     // clear the customer's cart
     customer.value.cart.items = [];
-    localStorage.setItem('customer', JSON.stringify(customer.value));
+    Customer.toLocalStorage(customer.value);
 
     // redirect back to catalogue after short delay
     setTimeout(() => {

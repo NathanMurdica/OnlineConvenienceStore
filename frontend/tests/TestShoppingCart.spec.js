@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import ShoppingCart from '../src/models/shoppingCart.js';
-import Item from '../src/models/item.js';
+import ShoppingCart from '../src/models/shoppingCart.ts';
+import Item from '../src/models/item.ts';
 
 describe('ShoppingCart Class', () => {
   let cart;

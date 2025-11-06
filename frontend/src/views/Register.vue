@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import Customer from '../models/customer.js';
+import Customer from '../models/customer.ts';
 import router from '../router/index.js';
 import { registerUser } from '../utils/database.js';
 import { debug } from "../utils/debug.js"
@@ -30,7 +30,7 @@ const name = defineModel('name');
 const email = defineModel('email');
 const password = defineModel('password');
 
-function register() {
+async function register() {
   // Basic validation
   if (!name.value || !email.value || !password.value) {
     alert('Please fill in name, email and password.');
@@ -49,22 +49,27 @@ function register() {
 
   debug('Customer to register:', customer);
 
-  const data = registerUser(customer)
-  if (!data) {
+  try {
+    const data = await registerUser(customer)
+    if (!data) {
+      alert('Registration failed. Please try again.');
+      return;
+    }
+    const userData = data.user;
+
+    debug('Customer registered with Backend:', userData);
+
+    localStorage.setItem('customer', Customer.fromJSON(userData));
+    localStorage.setItem('hasAuth', 'true');
+
+    debug('Customer set in localStorage:', localStorage.getItem('customer'));
+
+    // navigate to the catalogue (home)
+    router.push('/');
+  } 
+  catch (error) {
+    console.error('Registration error:', error);
     alert('Registration failed. Please try again.');
-    return;
   }
-  const userData = data.user;
-
-  debug('Customer registered with Backend:', userData);
-
-  localStorage.setItem('customer', JSON.stringify(userData));
-  // mark that the user is authenticated (simple flag used by router)
-  localStorage.setItem('hasAuth', 'true');
-
-  debug('Customer set in localStorage:', localStorage.getItem('customer'));
-
-  // navigate to the catalogue (home)
-  router.push('/');
 }
 </script>
