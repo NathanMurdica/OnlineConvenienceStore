@@ -1,6 +1,9 @@
 import Item from "./item.js";
+import { debug } from "../utils/debug.js";
 
-export default class ShoppingCart {
+class ShoppingCart {
+    items;
+
     constructor() {
         this.items = []; // { item: Item, quantity: number }
     }
@@ -15,7 +18,7 @@ export default class ShoppingCart {
             this.items.push({ item, quantity });
         }
 
-        console.log(`Added ${quantity} of ${item.name} to cart.`);
+        debug(`Added ${quantity} of ${item.name} to cart.`);
     }
 
     removeItem(itemId) {
@@ -23,16 +26,26 @@ export default class ShoppingCart {
     }
 
     increaseQuantity(itemId) {
-        const entry = this.items.find(i => i.item.id === itemId);
-        if (entry && entry.quantity < entry.item.stock) {
-            entry.quantity++;
+        const index = this.items.findIndex(i => i.item.id === itemId);
+        if (index >= 0 && this.items[index].quantity < this.items[index].item.stock) {
+            // Create new array with updated entry to trigger reactivity
+            this.items = [
+                ...this.items.slice(0, index),
+                { ...this.items[index], quantity: this.items[index].quantity + 1 },
+                ...this.items.slice(index + 1)
+            ];
         }
     }
 
     decreaseQuantity(itemId) {
-        const entry = this.items.find(i => i.item.id === itemId);
-        if (entry && entry.quantity > 1) {
-            entry.quantity--;
+        const index = this.items.findIndex(i => i.item.id === itemId);
+        if (index >= 0 && this.items[index].quantity > 1) {
+            // Create new array with updated entry to trigger reactivity
+            this.items = [
+                ...this.items.slice(0, index),
+                { ...this.items[index], quantity: this.items[index].quantity - 1 },
+                ...this.items.slice(index + 1)
+            ];
         }
     }
 
@@ -56,10 +69,28 @@ export default class ShoppingCart {
 
     static fromJSON(cartData) {
         const cart = new ShoppingCart();
-        cart.items = cartData.map(d => ({
-            item: Item.fromJSON(d),
-            quantity: d.quantity
-        }));
+        
+        // Handle null, undefined, or non-array input
+        if (!cartData || !Array.isArray(cartData)) {
+            debug('(ShoppingCart.fromJSON) No valid cart data provided, creating empty cart.');
+            return cart;
+        }
+        
+        debug('(ShoppingCart.fromJSON) Deserializing ShoppingCart from JSON:', cartData);
+        
+        cartData.forEach(item => {
+            if (item && typeof item === 'object') {
+                const itemData = item.item || item; // handle both {item, quantity} and direct item format
+                cart.items.push({
+                    item: Item.fromJSON(itemData),
+                    quantity: item.quantity || 1
+                });
+            }
+        });
+        
         return cart;
     }
 }
+
+export { ShoppingCart };
+export default ShoppingCart;

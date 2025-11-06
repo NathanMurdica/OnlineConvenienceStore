@@ -4,6 +4,8 @@
 */
 
 import Item from '../models/item.js';
+import Customer from '../models/customer.js';
+import { debug } from './debug.js';
 
 const API_BASE_URL = 'http://localhost:8000'; // FastAPI default port
 
@@ -44,7 +46,9 @@ export async function checkout(cartItems) {
         }
 
         const data = await response.json();
-        console.log('Checkout success:', data.message);
+
+        debug('Checkout success:', data.message);
+
         return data.updated_items || [];
     } catch (error) {
         console.error('Checkout Error:', error);
@@ -60,14 +64,15 @@ export async function registerUser(userData) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userData),
         });
-
-        const data = await response.json();
         
         if (!response.ok) {
             throw new Error(data.detail || 'Registration failed');
         }
 
-        console.log('Registration success:', data.message);
+        const data = await response.json();
+
+        debug('Registration success:', data.message);
+
         return data;
     } catch (error) {
         console.error('Registration Error:', error);
@@ -76,7 +81,7 @@ export async function registerUser(userData) {
 }
 
 // ========== User Login ==========
-export async function loginUser(credentials) {
+export async function loginUser(credentials/*: Customer */) {
     try {
         const response = await fetch(`${API_BASE_URL}/login`, {
             method: 'POST',
@@ -90,11 +95,14 @@ export async function loginUser(credentials) {
         }
 
         const data = await response.json();
-        console.log('Login success:', data.message);
-        console.log('User data:', credentials);
-        return data.user || null;
+        debug('(database.loginUser) Login success:', data.message);
+        debug('(database.loginUser) User data from database:', data.user);
+        const customer = new Customer(data.user);
+        debug('(database.loginUser) Created Customer instance:', customer);
+
+        return customer || null;
     } catch (error) {
-        console.error('Login Error:', error);
+        console.error('(database.loginUser) Login Error:', error);
         throw error;
     }
 }

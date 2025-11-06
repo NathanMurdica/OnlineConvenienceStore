@@ -4,6 +4,11 @@
 */
 
 export default class Item {
+    id;
+    name;
+    price;
+    stock;
+
     constructor(id, name, price, stock) {
         this.id = id;
         this.name = name;

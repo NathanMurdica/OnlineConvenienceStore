@@ -107,6 +107,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import Customer from '../models/customer.js';
 import router from '../router/index.js';
+import { debug } from "../utils/debug.js"
 import Order from '../models/order.js';
 import { checkoutOrder } from '../utils/database.js';
 
@@ -118,14 +119,15 @@ const errorMessage = ref('');
 const successMessage = ref('');
 
 onMounted(() => {
-  const storedCustomer = localStorage.getItem('customer');
-  if (storedCustomer) {
-    try {
-      customer.value = Customer.fromJSON(JSON.parse(storedCustomer));
-    } catch (err) {
-      console.error('Failed to parse customer from localStorage:', err);
-    }
-  }
+  customer.value = Customer.fromLocalStorage();
+  // const storedCustomer = localStorage.getItem('customer');
+  // if (storedCustomer) {
+  //   try {
+  //     customer.value = Customer.fromJSON(JSON.parse(storedCustomer));
+  //   } catch (err) {
+  //     console.error('Failed to parse customer from localStorage:', err);
+  //   }
+  // }
 });
 
 // persist updates
@@ -133,7 +135,8 @@ watch(
   () => customer.value?.cart.items,
   () => {
     if (customer.value) {
-      localStorage.setItem('customer', JSON.stringify(customer.value));
+      Customer.toLocalStorage(customer.value);
+      // localStorage.setItem('customer', JSON.stringify(customer.value));
     }
   },
   { deep: true }
@@ -169,7 +172,7 @@ async function confirmPurchase() {
 
     // Clear cart
     customer.value.cart.items = [];
-    localStorage.setItem('customer', JSON.stringify(customer.value));
+    Customer.toLocalStorage(customer.value);
 
     setTimeout(() => router.push('/'), 1500);
 

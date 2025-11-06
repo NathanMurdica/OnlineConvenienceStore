@@ -34,17 +34,14 @@ const customer = ref(null);
 const orders = ref([]);
 
 onMounted(async () => {
-  const storedCustomer = localStorage.getItem('customer');
-  if (storedCustomer) {
-    customer.value = Customer.fromJSON(JSON.parse(storedCustomer));
-    // fetch orders from backend for this customer
-    try {
-      const res = await fetch(`${API_BASE_URL}/orders/${customer.value.id}`);
-      const data = await res.json();
-      orders.value = data.orders || [];
-    } catch (err) {
-      console.error('Failed to fetch orders:', err);
-    }
+  customer.value = Customer.fromLocalStorage();
+  // fetch orders from backend for this customer
+  try {
+    const res = await fetch(`${API_BASE_URL}/orders/${customer.value.id}`);
+    const data = await res.json();
+    orders.value = data.orders || [];
+  } catch (err) {
+    console.error('Failed to fetch orders:', err);
   }
 });
 
