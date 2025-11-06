@@ -106,3 +106,36 @@ export async function loginUser(credentials/*: Customer */) {
         throw error;
     }
 }
+
+export async function checkoutOrder(order) {
+  /*
+      order should be an Order instance with .toJSON() method
+      Example:
+      {
+          user_id: 1,
+          items: [
+              { id: 1, quantity: 2 },
+              { id: 3, quantity: 1 }
+          ],
+          date: "2025-11-06T14:00:00.000Z"
+      }
+  */
+  try {
+    const response = await fetch(`${API_BASE_URL}/checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(order.toJSON()),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || data.detail || 'Checkout failed');
+    }
+
+    return data; // { message: 'Checkout successful' }
+  } catch (error) {
+    console.error('Checkout Error:', error);
+    throw error;
+  }
+}

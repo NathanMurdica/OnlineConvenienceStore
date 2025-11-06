@@ -109,7 +109,7 @@ import Customer from '../models/customer.ts';
 import router from '../router/index.js';
 import { debug } from "../utils/debug.js"
 import Order from '../models/order.js';
-
+import { checkoutOrder } from '../utils/database.js';
 
 const API_BASE_URL = "http://127.0.0.1:8000"; // FastAPI backend
 
@@ -162,25 +162,15 @@ async function confirmPurchase() {
   successMessage.value = '';
 
   try {
-    // Create an order object from the customer's cart
+    // Create order from the customer's cart
     const order = Order.fromCart(customer.value);
 
-    debug('Sending checkout payload to backend:', payload);
+    // Use the centralized database function
+    const result = await checkoutOrder(order);
 
-    const response = await fetch(`${API_BASE_URL}/checkout`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(order.toJSON()),
-    });
+    successMessage.value = result.message || 'Purchase successful!';
 
-    if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.detail || 'Checkout failed');
-    }
-
-    successMessage.value = 'Purchase successful!';
-
-    // clear the cart
+    // Clear cart
     customer.value.cart.items = [];
     Customer.toLocalStorage(customer.value);
 
