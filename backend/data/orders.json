@@ -38,5 +38,37 @@
             }
         ],
         "total": 7.5
+    },
+    {
+        "id": 1762433570,
+        "user_id": 1,
+        "date": "2025-11-06T23:52:50.940713",
+        "items": [
+            {
+                "id": 1,
+                "quantity": 1,
+                "name": "Instant Noodles",
+                "price": 3.5
+            },
+            {
+                "id": 2,
+                "quantity": 1,
+                "name": "Soft Drink",
+                "price": 2.0
+            },
+            {
+                "id": 3,
+                "quantity": 1,
+                "name": "Chocolate Bar",
+                "price": 1.5
+            },
+            {
+                "id": 6,
+                "quantity": 1,
+                "name": "Eggs (Dozen)",
+                "price": 5.0
+            }
+        ],
+        "total": 12.0
     }
 ]

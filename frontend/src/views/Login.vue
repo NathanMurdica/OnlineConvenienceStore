@@ -5,11 +5,17 @@
   <form v-on:submit.prevent="login">
     <div class="mb-3">
       <label for="email" class="form-label">Email address</label>
-      <input type="email" class="form-control" id="email" v-model="email" placeholder="Email" required>
+      <input type="email" class="form-control" id="email" v-model="email" 
+        :class="{ 'is-invalid': errors.email }"
+        placeholder="Email" required>
+      <div class="invalid-feedback" v-if="errors.email">{{ errors.email }}</div>
     </div>
     <div class="mb-3">
       <label for="password" class="form-label">Password</label>
-      <input type="password" class="form-control" id="password" v-model="password" placeholder="Password" required>
+      <input type="password" class="form-control" id="password" v-model="password" 
+        :class="{ 'is-invalid': errors.password }"
+        placeholder="Password" required>
+      <div class="invalid-feedback" v-if="errors.password">{{ errors.password }}</div>
     </div>
     <button class="btn btn-primary" type="submit">Login</button>
   </form>
@@ -23,15 +29,26 @@ import router from '../router/index.js';
 import { debug } from "../utils/debug.js"
 import { ref } from 'vue';
 import { ShoppingCart } from '../models/shoppingCart.js';
+import { validateLogin } from '../utils/validation.js';
 
 const email = defineModel('email');
 const password = defineModel('password');
+const errors = ref({});
 
 const customer = ref(new Customer());
-// const userData = ref(null);
 
 async function login() {
   try {
+    // Reset previous errors
+    errors.value = {};
+    
+    // Validate form data
+    const validation = validateLogin({ email: email.value, password: password.value });
+    if (!validation.isValid) {
+      errors.value = validation.errors;
+      return;
+    }
+
     customer.value = new Customer({ id: 0, name: '', email: email.value, password: password.value, cart: new ShoppingCart() });
     debug('(Login) Logging in user:', customer.value);
     const userData = await loginUser(customer.value);
@@ -42,17 +59,16 @@ async function login() {
     } 
     else {
       debug('(Login) User Data from Backend:', userData);
-
       const storedCustomer = new Customer(userData);
 
       debug('(Login) Customer to set in localStorage:', storedCustomer);
-
       Customer.toLocalStorage(storedCustomer);
-      localStorage.setItem('hasAuth', 'true');
-      const customerFromStorage = Customer.fromLocalStorage();
-
-      debug('(Login) Created Authentication token');
       debug('(Login) Value in LocalStorage:', localStorage.getItem('customer'));
+
+      localStorage.setItem('hasAuth', 'true');
+      debug('(Login) Created Authentication token');
+
+      const customerFromStorage = Customer.fromLocalStorage();
       debug('(Login) Customer set in localStorage:', customerFromStorage);
 
       // navigate to the catalogue (home)
