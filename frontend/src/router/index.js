@@ -3,6 +3,7 @@ import Catalogue from "../views/Catalogue.vue"
 import Login from "../views/Login.vue"
 import Register from "../views/Register.vue"
 import Checkout from "../views/Checkout.vue"
+import OrderHistory from '../views/OrderHistory.vue';
 
 const routes = [
     // NOTE: all pages aside from login will require "hasAuth = true" (set with localStorage) 
@@ -29,6 +30,11 @@ const routes = [
         name: "Checkout",
         component: Checkout,
         meta: { requiresAuth: true }
+    },
+    {
+        path: '/OrderHistory',
+        name: 'OrderHistory',
+        component: OrderHistory
     }
 ]
 
