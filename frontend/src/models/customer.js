@@ -1,15 +1,15 @@
-import ShoppingCart from './shoppingCart.ts';
+import ShoppingCart from './shoppingCart.js';
 import { debug } from '../utils/debug.js';
-import Item from './item.ts';
+import Item from './item.js';
 
 class Customer {
-    id: number | null;
-    name: string;
-    email: string;
-    password: string;
-    cart: ShoppingCart;
+    id;
+    name;
+    email;
+    password;
+    cart;
 
-    constructor({ id = null, name = '', email = '', password = '', cart = undefined }: { id?: number | null, name?: string, email?: string, password?: string, cart?: any } = {}) {
+    constructor({ id = null, name = '', email = '', password = '', cart = undefined } = {}) {
         debug('(Customer.constructor) Creating Customer:', { id, name, email, password, cart });
         this.id = id;
         this.name = name;
@@ -19,11 +19,11 @@ class Customer {
         this.cart = cart ? ShoppingCart.fromJSON(cart) : new ShoppingCart();
     }
 
-    addToCart(item: Item) {
+    addToCart(item) {
         this.cart.addItem(item);
     }
 
-    removeFromCart(productId: number) {
+    removeFromCart(productId) {
         this.cart.removeItem(productId);
     }
 
@@ -39,7 +39,7 @@ class Customer {
         return { total, items };
     }
 
-    toJSON(): any {
+    toJSON() {
         return {
             id: this.id,
             name: this.name,
@@ -49,7 +49,7 @@ class Customer {
         };
     }
 
-    static fromJSON(json: any): Customer {
+    static fromJSON(json) {
         debug('(Customer.fromJSON) Deserializing Customer from JSON:', json);
         
         const cartData = Array.isArray(json.cart) ? json.cart : [];
@@ -67,12 +67,12 @@ class Customer {
         return customer;
     }
 
-    static toLocalStorage(customer: Customer) {
+    static toLocalStorage(customer) {
         localStorage.setItem('customer', JSON.stringify(customer.toJSON()));
         debug('(Customer.toLocalStorage) Stored Customer in localStorage:', customer);
     }
 
-    static fromLocalStorage(): Customer {
+    static fromLocalStorage() {
         const data = localStorage.getItem('customer');
         if (data) {
             debug('(Customer.fromLocalStorage) Customer data from localStorage:', data);

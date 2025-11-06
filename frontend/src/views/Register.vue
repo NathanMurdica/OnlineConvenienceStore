@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import Customer from '../models/customer.ts';
+import Customer from '../models/customer.js';
 import router from '../router/index.js';
 import { registerUser } from '../utils/database.js';
 import { debug } from "../utils/debug.js"

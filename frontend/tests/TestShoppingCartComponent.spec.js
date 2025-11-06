@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ShoppingCartComponent from '../src/components/ShoppingCart.vue';
-import ShoppingCart from '../src/models/shoppingCart.ts';
-import Item from '../src/models/item.ts';
+import ShoppingCart from '../src/models/shoppingCart.js';
+import Item from '../src/models/item.js';
 
 describe('ShoppingCart.vue Component', () => {
   let cart;

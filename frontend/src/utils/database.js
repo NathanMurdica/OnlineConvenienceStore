@@ -3,8 +3,8 @@
     Handles API calls to the backend to fetch and manipulate data.
 */
 
-import Item from '../models/item.ts';
-import Customer from '../models/customer.ts';
+import Item from '../models/item.js';
+import Customer from '../models/customer.js';
 import { debug } from './debug.js';
 
 const API_BASE_URL = 'http://localhost:8000'; // FastAPI default port

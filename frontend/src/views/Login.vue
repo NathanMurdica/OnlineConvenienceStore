@@ -17,18 +17,15 @@
 </template>
 
 <script setup>
-import Customer from '../models/customer.ts';
+import Customer from '../models/customer.js';
 import { loginUser } from '../utils/database.js';
 import router from '../router/index.js';
 import { debug } from "../utils/debug.js"
 import { ref } from 'vue';
-import { ShoppingCart } from '../models/shoppingCart.ts';
+import { ShoppingCart } from '../models/shoppingCart.js';
 
 const email = defineModel('email');
 const password = defineModel('password');
-// Remove Temporary Defaults!!!
-email.value = "fdsa@fdsa";
-password.value = "fdsa";
 
 const customer = ref(new Customer());
 // const userData = ref(null);

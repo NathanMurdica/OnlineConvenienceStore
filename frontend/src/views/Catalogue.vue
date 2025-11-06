@@ -59,7 +59,7 @@
 import { ref, onMounted, watch, reactive } from 'vue';
 import ShoppingCart from '../components/ShoppingCart.vue';
 import Catalogue from '../models/catalogue.js';
-import Customer from '../models/customer.ts';
+import Customer from '../models/customer.js';
 import router from '../router/index.js';
 import { debug } from "../utils/debug.js"
 

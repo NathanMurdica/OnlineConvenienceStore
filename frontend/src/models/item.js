@@ -4,12 +4,12 @@
 */
 
 export default class Item {
-    id: number;
-    name: string;
-    price: number;
-    stock: number;
+    id;
+    name;
+    price;
+    stock;
 
-    constructor(id: number, name: string, price: number, stock: number) {
+    constructor(id, name, price, stock) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -18,12 +18,12 @@ export default class Item {
 
     // --- Helper methods ---
 
-    get formattedPrice(): string {
+    get formattedPrice() {
         // returns "$2.00"
         return `$${this.price.toFixed(2)}`;
     }
 
-    get isAvailable(): boolean {
+    get isAvailable() {
         return this.stock > 0;
     }
 
@@ -37,7 +37,7 @@ export default class Item {
         this.stock += amount;
     }
 
-    toJSON(): any {
+    toJSON() {
         // makes sure the object is serializable for API calls
         return {
             id: this.id,
@@ -47,7 +47,7 @@ export default class Item {
         };
     }
 
-    static fromJSON(json: any): Item {
+    static fromJSON(json) {
         // convenient factory for constructing an Item from API data
         return new Item(json.id, json.name, json.price, json.stock);
     }

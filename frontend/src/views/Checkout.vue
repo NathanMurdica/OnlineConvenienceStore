@@ -105,7 +105,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import Customer from '../models/customer.ts';
+import Customer from '../models/customer.js';
 import router from '../router/index.js';
 import { debug } from "../utils/debug.js"
 import Order from '../models/order.js';

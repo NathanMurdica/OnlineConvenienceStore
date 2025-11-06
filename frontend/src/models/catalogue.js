@@ -1,5 +1,5 @@
 // src/models/catalogue.js
-import Item from './item.ts';
+import Item from './item.js';
 import { fetchItems } from '../utils/database.js';
 
 export default class Catalogue {
