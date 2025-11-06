@@ -78,10 +78,8 @@ class Customer {
                 return customer;
             } catch (error) {
                 console.error('Failed to parse customer from localStorage:', error)
-            } finally {
                 return new Customer();
             }
-
         }
         debug('(Customer.fromLocalStorage) No Customer found in localStorage, returning empty Customer.');
         return new Customer();
