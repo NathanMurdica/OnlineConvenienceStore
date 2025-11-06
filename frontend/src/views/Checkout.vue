@@ -107,6 +107,8 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import Customer from '../models/customer.js';
 import router from '../router/index.js';
+import Order from '../models/order.js';
+
 
 const API_BASE_URL = "http://127.0.0.1:8000"; // FastAPI backend
 
@@ -157,19 +159,13 @@ async function confirmPurchase() {
   successMessage.value = '';
 
   try {
-    // send checkout to backend API
-    const payload = {
-      user_id: customer.value.id,
-      items: cartItems.value.map(entry => ({
-        id: entry.item.id,
-        quantity: entry.quantity
-  }))
-};
+    // Create an order object from the customer's cart
+    const order = Order.fromCart(customer.value);
 
     const response = await fetch(`${API_BASE_URL}/checkout`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(order.toJSON()),
     });
 
     if (!response.ok) {
@@ -183,7 +179,6 @@ async function confirmPurchase() {
     customer.value.cart.items = [];
     localStorage.setItem('customer', JSON.stringify(customer.value));
 
-    // redirect after short delay
     setTimeout(() => router.push('/'), 1500);
 
   } catch (err) {
