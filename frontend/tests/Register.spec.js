@@ -115,7 +115,7 @@ describe('Register.vue Component', () => {
     
     // Verify registerUser was called with correct data
     expect(registerUser).toHaveBeenCalledWith(expect.objectContaining({
-      name: '',  // This is empty because of how Customer is constructed in Register.vue
+      name: 'John Doe',
       email: 'test@test.com',
       password: 'password123'
     }))

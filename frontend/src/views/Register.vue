@@ -63,7 +63,7 @@ async function register() {
     }
 
     debug('(Register) Registering user:', { name: name.value, email: email.value, password: password.value });
-    customer.value = new Customer({ id: 0, name: '', email: email.value, password: password.value, cart: new ShoppingCart() });
+    customer.value = new Customer({ id: 0, name: name.value, email: email.value, password: password.value, cart: new ShoppingCart() });
     
     debug('(Register) Customer to register:', customer.value);
     const userData = await registerUser(customer.value);

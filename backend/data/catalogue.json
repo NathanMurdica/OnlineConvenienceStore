@@ -9,13 +9,13 @@
         "id": 2,
         "name": "Soft Drink",
         "price": 2.0,
-        "stock": 49
+        "stock": 47
     },
     {
         "id": 3,
         "name": "Chocolate Bar",
         "price": 1.5,
-        "stock": 27
+        "stock": 25
     },
     {
         "id": 4,
@@ -39,13 +39,13 @@
         "id": 7,
         "name": "Milk (1L)",
         "price": 3.0,
-        "stock": 40
+        "stock": 36
     },
     {
         "id": 8,
         "name": "Cheese Slice",
         "price": 2.8,
-        "stock": 35
+        "stock": 34
     },
     {
         "id": 9,

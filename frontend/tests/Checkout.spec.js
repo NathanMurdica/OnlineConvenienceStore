@@ -17,9 +17,22 @@ vi.mock('../src/utils/database.js', () => ({
 }))
 
 // mock Customer model
-vi.mock('../src/models/customer.js', () => ({
-  default: { fromJSON: (data) => data }
-}))
+vi.mock('../src/models/customer.js', () => {
+  return {
+    default: class {
+      static fromLocalStorage() {
+        const data = localStorage.getItem('customer')
+        return data ? JSON.parse(data) : null
+      }
+      static toLocalStorage(customer) {
+        localStorage.setItem('customer', JSON.stringify(customer))
+      }
+      constructor(init) {
+        Object.assign(this, init)
+      }
+    }
+  }
+})
 
 // mock Order model
 vi.mock('../src/models/order.js', () => ({
