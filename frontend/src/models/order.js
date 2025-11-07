@@ -1,6 +1,13 @@
 import Item from './item.js';
 
 export default class Order {
+  userID;
+  items;
+  date;
+  subtotal;
+  tax;
+  total;
+
   constructor({ userId = 0, items = [], date = new Date() } = {}) {
     this.userId = userId;
     // Ensure items are Item objects with quantity

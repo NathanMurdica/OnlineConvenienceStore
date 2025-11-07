@@ -19,6 +19,7 @@
           <router-link class="nav-link" to="/OrderHistory">Order History</router-link>
         </li>
       </ul>
+      <button class="btn btn-outline-danger ms-auto float-left" @click="logout">Logout</button>
     </nav>
 
     <router-view />
@@ -26,6 +27,13 @@
 </template>
 
 <script setup>
+function logout() {
+  localStorage.removeItem('customer');
+  localStorage.removeItem('hasAuth');
+  location.reload(); // Reload to reset state
+  // navigate to the catalogue (home)
+  router.push('/');
+}
 </script>
 
 <style>

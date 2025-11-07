@@ -34,7 +34,8 @@ const routes = [
     {
         path: '/OrderHistory',
         name: 'OrderHistory',
-        component: OrderHistory
+        component: OrderHistory,
+        meta: { requiresAuth: true }
     }
 ]
 
@@ -46,7 +47,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     if (to.meta.requiresAuth) {
         const token = localStorage.getItem('hasAuth');
-        if (token) {
+        if (token === 'true') {
             // User is authenticated, proceed to the route
             next();
         } else {

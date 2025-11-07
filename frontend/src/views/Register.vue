@@ -74,7 +74,7 @@ async function register() {
     }
     else {
       debug('(Register) User Data from Backend:', userData);
-      const storedCustomer = new Customer(userData.user);
+      const storedCustomer = new Customer(userData);
 
       debug('(Register) Customer registered with Backend:', storedCustomer);
       Customer.toLocalStorage(storedCustomer);
