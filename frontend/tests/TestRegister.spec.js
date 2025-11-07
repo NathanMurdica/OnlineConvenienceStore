@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import Register from '../src/views/Register.vue'
 import { validateRegistration } from '../src/utils/validation.js'
-import router from '../src/router'
+import router from '../src/router/index.js'
 import { registerUser } from '../src/utils/database.js'
 
 // Mock the router
