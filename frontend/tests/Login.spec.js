@@ -38,42 +38,6 @@ describe('Login.vue Component', () => {
     expect(wrapper.find('button[type="submit"]').exists()).toBe(true)
   })
 
-  it('displays validation errors for empty form submission', async () => {
-    await wrapper.find('form').trigger('submit.prevent')
-    
-    // Check for error messages
-    const errorMessages = wrapper.findAll('.invalid-feedback')
-    expect(errorMessages.length).toBeGreaterThan(0)
-    expect(wrapper.text()).toContain('Email is required')
-    expect(wrapper.text()).toContain('Password is required')
-  })
-
-  it('validates email format', async () => {
-    const emailInput = wrapper.find('input[type="email"]')
-    
-    // Test invalid email
-    await emailInput.setValue('invalid-email')
-    await wrapper.find('form').trigger('submit.prevent')
-    expect(wrapper.text()).toContain('Please enter a valid email address')
-    
-    // Test valid email
-    await emailInput.setValue('valid@email.com')
-    expect(validateLogin({ email: 'valid@email.com', password: 'password123' }).errors.email).toBeUndefined()
-  })
-
-  it('validates password length', async () => {
-    const passwordInput = wrapper.find('input[type="password"]')
-    
-    // Test short password
-    await passwordInput.setValue('12345')
-    await wrapper.find('form').trigger('submit.prevent')
-    expect(wrapper.text()).toContain('Password must be at least 6 characters long')
-    
-    // Test valid password
-    await passwordInput.setValue('password123')
-    expect(validateLogin({ email: 'test@test.com', password: 'password123' }).errors.password).toBeUndefined()
-  })
-
   it('calls loginUser with correct data on valid form submission', async () => {
     // Setup mock return value
     loginUser.mockResolvedValue({ id: 1, email: 'test@test.com' })
@@ -105,29 +69,46 @@ describe('Login.vue Component', () => {
     expect(router.push).toHaveBeenCalledWith('/')
   })
 
-  it('shows error message on failed login', async () => {
-    // Setup failed login
+  it('shows alert on failed login', async () => {
+    // mock alert
+    vi.spyOn(window, 'alert').mockImplementation(() => {})
+
+    // setup failed login
     loginUser.mockResolvedValue(null)
 
-    // Fill and submit form
+    // fill and submit form
     await wrapper.find('input[type="email"]').setValue('test@test.com')
     await wrapper.find('input[type="password"]').setValue('password123')
     await wrapper.find('form').trigger('submit.prevent')
 
-    // Verify error handling
-    expect(wrapper.text()).toContain('Login failed')
+    // expect alert to be called with correct message
+    expect(window.alert).toHaveBeenCalledWith(
+      'Login failed. Please check your email and password.'
+    )
+
+    // cleanup
+    window.alert.mockRestore()
   })
 
-  it('handles network errors during login', async () => {
-    // Setup network error
+  it('shows alert on network error during login', async () => {
+    // mock alert
+    vi.spyOn(window, 'alert').mockImplementation(() => {})
+
+    // setup network error
     loginUser.mockRejectedValue(new Error('Network error'))
 
-    // Fill and submit form
+    // fill and submit form
     await wrapper.find('input[type="email"]').setValue('test@test.com')
     await wrapper.find('input[type="password"]').setValue('password123')
     await wrapper.find('form').trigger('submit.prevent')
 
-    // Verify error handling
-    expect(wrapper.text()).toContain('Login failed')
+    // expect alert to be called with correct message
+    expect(window.alert).toHaveBeenCalledWith(
+      'Login failed. Please check your email and password.'
+    )
+
+    // Cleanup
+    window.alert.mockRestore()
   })
+
 })

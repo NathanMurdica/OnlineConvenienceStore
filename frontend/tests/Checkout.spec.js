@@ -2,7 +2,7 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // --- MOCK DEPENDENCIES ---
-// Mock router inside the factory (no external pushMock variable!)
+// mock router inside the factory (no external pushMock variable!)
 vi.mock('../src/router/index.js', () => {
   return {
     default: {
@@ -11,22 +11,21 @@ vi.mock('../src/router/index.js', () => {
   }
 })
 
-// Mock database checkout function
+// mock database checkout function
 vi.mock('../src/utils/database.js', () => ({
   checkoutOrder: vi.fn().mockResolvedValue({ message: 'Purchase successful!' })
 }))
 
-// Mock Customer model
+// mock Customer model
 vi.mock('../src/models/customer.js', () => ({
   default: { fromJSON: (data) => data }
 }))
 
-// Mock Order model
+// mock Order model
 vi.mock('../src/models/order.js', () => ({
   default: { fromCart: (customer) => ({ customer, total: 20 }) }
 }))
 
-// ✅ Import AFTER mocks
 import Checkout from '../src/views/Checkout.vue'
 import router from '../src/router/index.js'
 import { checkoutOrder } from '../src/utils/database.js'

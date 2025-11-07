@@ -68,7 +68,7 @@ describe('ShoppingCart.vue Component', () => {
     expect(wrapper.emitted()).toHaveProperty('increase'); // pass emit to the catalogue
 
     // Decrease button
-    await buttons.find(btn => btn.text() === '−').trigger('click');
+    await buttons.find(btn => btn.text() === '-').trigger('click');
     expect(wrapper.emitted()).toHaveProperty('decrease');
 
     // Remove button

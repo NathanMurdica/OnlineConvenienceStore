@@ -135,32 +135,48 @@ describe('Register.vue Component', () => {
     expect(router.push).toHaveBeenCalledWith('/')
   })
 
-  it('shows error message on failed registration', async () => {
-    // Setup failed registration
+  it('shows alert on failed registration', async () => {
+    // mock alert
+    vi.spyOn(window, 'alert').mockImplementation(() => {})
+
+    // setup failed registration
     registerUser.mockResolvedValue(null)
 
-    // Fill and submit form
+    // fill and submit form
     await wrapper.find('input[type="text"]').setValue('John Doe')
     await wrapper.find('input[type="email"]').setValue('test@test.com')
     await wrapper.find('input[type="password"]').setValue('password123')
     await wrapper.find('form').trigger('submit.prevent')
 
-    // Verify error handling
-    expect(wrapper.text()).toContain('Registration failed')
+    // expect alert to be called with correct message
+    expect(window.alert).toHaveBeenCalledWith(
+      'Registration failed. Please try again.'
+    )
+
+    // cleanup
+    window.alert.mockRestore()
   })
 
-  it('handles network errors during registration', async () => {
-    // Setup network error
+  it('shows alert on network error during registration', async () => {
+    // mock alert
+    vi.spyOn(window, 'alert').mockImplementation(() => {})
+
+    // setup network error
     registerUser.mockRejectedValue(new Error('Network error'))
 
-    // Fill and submit form
+    // fill and submit form
     await wrapper.find('input[type="text"]').setValue('John Doe')
     await wrapper.find('input[type="email"]').setValue('test@test.com')
     await wrapper.find('input[type="password"]').setValue('password123')
     await wrapper.find('form').trigger('submit.prevent')
 
-    // Verify error handling
-    expect(wrapper.text()).toContain('Registration failed')
+    // expect alert to be called with correct message
+    expect(window.alert).toHaveBeenCalledWith(
+      'Registration failed. Please try again.'
+    )
+
+    // cleanup
+    window.alert.mockRestore()
   })
 
   it('sets authentication token on successful registration', async () => {

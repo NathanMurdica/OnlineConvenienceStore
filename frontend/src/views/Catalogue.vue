@@ -43,7 +43,7 @@
     <!-- Right column: shopping cart summary -->
     <div class="col-12 col-md-4">
         <ShoppingCart 
-          :cart="customer.value?.cart"
+          :cart="cart"
           :cartVersion="cartVersion"
           @increase="increaseQty"
           @decrease="decreaseQty"
@@ -66,9 +66,9 @@ import { debug } from "../utils/debug.js"
 // reactive references
 const catalogue = ref(new Catalogue());
 const customer = ref(new Customer());
+const cart = ref(customer.value.cart);
 const catalogueItems = ref([]);
-// simple version counter to notify child components when the cart changes
-const cartVersion = ref(0);
+const cartVersion = ref(0); // simple version counter to notify child components when the cart changes
 
 // fetch data on mount
 onMounted(async () => {
@@ -79,7 +79,7 @@ onMounted(async () => {
   // make the entire cart instance reactive so nested mutations are observed by Vue
   try {
     if (customer.value?.cart) {
-      customer.value.cart = reactive(customer.value.cart);
+      customer.value.cart = customer.value.cart
     }
   } catch (err) {
     console.warn('Could not make cart reactive:', err);
@@ -98,35 +98,19 @@ onMounted(async () => {
 
 // persist customer to localStorage on cart changes
 watch(
-  () => customer.value?.cart.items,
+  () => customer.value.cart.items,
   () => {
-    if (customer.value) {
-      Customer.toLocalStorage(customer.value);
-      // localStorage.setItem('customer', customer.value.toJSON());
-      debug('Customer cart updated:', localStorage.getItem('customer'));
-    }
+    Customer.toLocalStorage(customer.value);
+    debug('Customer cart updated:', customer.value.cart.items);
   },
   { deep: true }
 );
 
-// cart operations
 function addToCart(item) {
   customer.value.cart.addItem(item);
-  // replace items array with a new copy so Vue detects the change when the ShoppingCart
-  // component receives the cart as a prop (forces reactive update)
-  try {
-    customer.value.cart.items = [...customer.value.cart.items];
-  } catch (err) {
-    console.warn('Could not reassign cart.items after addToCart:', err);
-  }
-  // ensure the cart proxy is applied to the instance
-  try {
-    customer.value.cart = reactive(customer.value.cart);
-  } catch (err) {
-    /* ignore */
-  }
-  // bump cartVersion so children know about this mutation
+  cart.value = customer.value.cart; // update cart reference
   cartVersion.value++;
+  Customer.toLocalStorage(customer.value);
 }
 
 // cart event handlers
@@ -134,13 +118,9 @@ function increaseQty(itemId) {
   customer.value.cart.increaseQuantity(itemId);
   try {
     customer.value.cart.items = [...customer.value.cart.items];
+    cart.value = customer.value.cart;
   } catch (err) {
     console.warn('Could not reassign cart.items after increaseQty:', err);
-  }
-  try {
-    customer.value.cart = reactive(customer.value.cart);
-  } catch (err) {
-    /* ignore */
   }
   cartVersion.value++;
 }
@@ -149,13 +129,9 @@ function decreaseQty(itemId) {
   customer.value.cart.decreaseQuantity(itemId);
   try {
     customer.value.cart.items = [...customer.value.cart.items];
+    cart.value = customer.value.cart;
   } catch (err) {
     console.warn('Could not reassign cart.items after decreaseQty:', err);
-  }
-  try {
-    customer.value.cart = reactive(customer.value.cart);
-  } catch (err) {
-    /* ignore */
   }
   cartVersion.value++;
 }
@@ -164,13 +140,9 @@ function removeItem(itemId) {
   customer.value.cart.removeItem(itemId);
   try {
     customer.value.cart.items = [...customer.value.cart.items];
+    cart.value = customer.value.cart;
   } catch (err) {
     console.warn('Could not reassign cart.items after removeItem:', err);
-  }
-  try {
-    customer.value.cart = reactive(customer.value.cart);
-  } catch (err) {
-    /* ignore */
   }
   cartVersion.value++;
 }

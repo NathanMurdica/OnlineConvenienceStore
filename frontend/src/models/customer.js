@@ -51,21 +51,18 @@ class Customer {
 
     static fromJSON(json) {
         debug('(Customer.fromJSON) Deserializing Customer from JSON:', json);
-        
-        const cartData = Array.isArray(json.cart) ? json.cart : [];
-        debug('(Customer.fromJSON) Cart data:', cartData);
-        
-        const customer = new Customer({
+
+        const cartData = json.cart ?? { items: [] }; // ensure correct structure
+
+        return new Customer({
             id: json.id,
             name: json.name,
             email: json.email,
             password: json.password,
-            cart: cartData // ShoppingCart constructor will handle this
+            cart: cartData, // ShoppingCart.fromJSON() inside constructor will handle it
         });
-        
-        debug('(Customer.fromJSON) Deserialized Customer from JSON:', customer);
-        return customer;
     }
+
 
     static toLocalStorage(customer) {
         localStorage.setItem('customer', JSON.stringify(customer.toJSON()));
