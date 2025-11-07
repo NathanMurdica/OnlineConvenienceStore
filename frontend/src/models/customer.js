@@ -1,6 +1,5 @@
 import ShoppingCart from './shoppingCart.js';
 import { debug } from '../utils/debug.js';
-import Item from './item.js';
 
 class Customer {
     id;
@@ -27,14 +26,9 @@ class Customer {
         this.cart.removeItem(productId);
     }
 
-    // updateCartQuantity(productId: number, quantity: number) {
-    //     this.cart.updateQuantity(productId, quantity); // 'updateQuantity' does not exist on type 'ShoppingCart'
-    // }
-
     checkout() {
         const total = this.cart.totalPrice;
         const items = this.cart.items;
-        // this.cart.clear();
         this.cart = new ShoppingCart(); // reset to empty cart
         return { total, items };
     }

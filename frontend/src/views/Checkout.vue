@@ -107,11 +107,8 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import Customer from '../models/customer.js';
 import router from '../router/index.js';
-import { debug } from "../utils/debug.js"
 import Order from '../models/order.js';
 import { checkoutOrder } from '../utils/database.js';
-
-const API_BASE_URL = "http://127.0.0.1:8000"; // FastAPI backend
 
 const customer = ref(null);
 const loading = ref(false);

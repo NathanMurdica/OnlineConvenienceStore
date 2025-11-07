@@ -56,7 +56,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, reactive } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import ShoppingCart from '../components/ShoppingCart.vue';
 import Catalogue from '../models/catalogue.js';
 import Customer from '../models/customer.js';
@@ -150,7 +150,6 @@ function removeItem(itemId) {
 function checkout() {
   debug('Proceeding to checkout with cart:', customer.value.cart);
   Customer.toLocalStorage(customer.value);
-  // localStorage.setItem('customer', JSON.stringify(customer.value));
   router.push('/checkout');
 }
 </script>

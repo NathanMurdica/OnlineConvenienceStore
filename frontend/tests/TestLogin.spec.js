@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import Login from '../src/views/Login.vue'
-import { validateLogin } from '../src/utils/validation.js'
 import router from '../src/router/index.js'
 import { loginUser } from '../src/utils/database.js'
 

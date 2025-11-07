@@ -6,9 +6,6 @@ import Checkout from "../views/Checkout.vue"
 import OrderHistory from '../views/OrderHistory.vue';
 
 const routes = [
-    // NOTE: all pages aside from login will require "hasAuth = true" (set with localStorage) 
-    // so user must login first
-    // either check if customer is set in localStorage OR check a boolean for login status
     {
         path: "/",
         name: "Catalogue",
